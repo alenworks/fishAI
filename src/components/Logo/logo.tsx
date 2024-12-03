@@ -1,5 +1,5 @@
 import Link from 'next/link'
-export default function Logo() {
+export function Logo() {
   return (
     <Link href="/" className="blog w-30 overflow-hidden">
       <h1 className="font-bold text-xl bg-muted w-32">
