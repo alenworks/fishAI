@@ -8,7 +8,7 @@ interface IProps {
 export function WriteNav(props: IProps) {
   const { workId } = props
   return (
-    <div className="h-[46px] flex text-secondary-foreground my-1 mx-3 bg-ground pb-1 border-b">
+    <div className="h-[46px] flex flex-auto text-secondary-foreground my-1 mx-3 bg-ground pb-1 border-b">
       {workId}
       <div className="text-start inline-flex items-center">
         <Logo />

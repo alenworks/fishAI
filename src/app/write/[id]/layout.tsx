@@ -1,21 +1,34 @@
 import { cookies } from 'next/headers'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
-import { LeftSidebar } from '@/components/LeftSidebar'
-
+import { LeftSidebar, LeftNav } from '@/components'
+import { WriteNav } from '@/components'
 export default async function Layout({
   children,
+  directory,
+  params,
 }: {
   children: React.ReactNode
+  directory: React.ReactNode
+  params: { id: string }
 }) {
   const cookieStore = await cookies()
   const defaultOpen = cookieStore.get('sidebar:state')?.value === 'true'
+  const { id } = await params
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
       <LeftSidebar />
-      <main className="flex flex-1">
-        <SidebarTrigger />
-        {children}
-      </main>
+      <LeftNav
+        directory={directory}
+        content={
+          <main className="flex flex-1 flex-col">
+            <div className="flex items-center">
+              <SidebarTrigger />
+              <WriteNav workId={id} />
+            </div>
+            {children}
+          </main>
+        }
+      />
     </SidebarProvider>
   )
 }
