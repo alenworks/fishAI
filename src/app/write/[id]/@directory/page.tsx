@@ -4,7 +4,7 @@ export default async function Directory({
 }: {
   params: { id: string }
 }) {
-  const { id } = await params
+  const { id } = params
   return (
     <div className=" h-[800px]">
       {[1, 2, 3, 4, 5, 6, 7].map((i) => (

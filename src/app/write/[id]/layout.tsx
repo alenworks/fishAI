@@ -13,7 +13,7 @@ export default async function Layout({
 }) {
   const cookieStore = await cookies()
   const defaultOpen = cookieStore.get('sidebar:state')?.value === 'true'
-  const { id } = await params
+  const { id } = params
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
       <LeftSidebar />
