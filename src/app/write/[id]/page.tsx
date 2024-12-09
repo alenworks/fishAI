@@ -1,6 +1,9 @@
 import { ScrollArea } from '@/components/ui/scroll-area'
 // import { WriteNav } from '@/components/index'
-export default function Write({ params }: { params: { id: string } }) {
+export default async function Write(props: {
+  params: Promise<{ id: string }>
+}) {
+  const params = await props.params
   const { id } = params
   return (
     <ScrollArea className="h-[calc(100vh-46px)]">

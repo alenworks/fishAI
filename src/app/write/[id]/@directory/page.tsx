@@ -1,9 +1,8 @@
 import { FileText } from 'lucide-react'
-export default async function Directory({
-  params,
-}: {
-  params: { id: string }
+export default async function Directory(props: {
+  params: Promise<{ id: string }>
 }) {
+  const params = await props.params
   const { id } = params
   return (
     <div className=" h-[800px]">
