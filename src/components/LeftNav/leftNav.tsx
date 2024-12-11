@@ -16,7 +16,7 @@ export function LeftNav({
 }) {
   return (
     <ResizablePanelGroup direction="horizontal">
-      <ResizablePanel defaultSize={15}>
+      <ResizablePanel style={{ minWidth: 180 }} defaultSize={15}>
         <div className="flex flex-col h-screen bg-muted text-muted-foreground p-2">
           <div>
             <Button className="w-full justify-start px-2" variant="ghost">

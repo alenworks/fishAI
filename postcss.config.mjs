@@ -1,7 +1,9 @@
 /** @type {import('postcss-load-config').Config} */
 const config = {
   plugins: {
-    tailwindcss: {},
+    'postcss-nested': {}, // CSS 嵌套插件
+    tailwindcss: {}, // Tailwind CSS 插件
+    autoprefixer: {}, // 自动前缀
   },
 }
 
