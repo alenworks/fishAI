@@ -1,21 +1,27 @@
-import { FileText } from 'lucide-react'
-export default async function Directory(props: {
-  params: Promise<{ id: string }>
-}) {
+import { create, search, searchByFilter } from './action'
+import CreateSubmitButton from './CreateSubmitButton'
+import Item from './item'
+export default async function Directory(props: { params: any }) {
   const params = await props.params
+  const docRes = await search()
+  const resByFilter = await searchByFilter('文档')
   const { id } = params
+
+  console.log(docRes, resByFilter, id)
   return (
     <div className=" h-[800px]">
-      {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-        <div
-          key={i}
-          className="inline-flex items-center w-full p-2 py-1 cursor-pointer hover:bg-card hover:text-secondary-foreground"
-        >
-          <FileText className="h-4 w-4" />
-          &nbsp;动物农场{i} {id}
-        </div>
+      {docRes.map((item) => (
+        <Item
+          key={item.id}
+          id={item.id}
+          title={item.title}
+          isCurrent={item.id === params.id}
+        />
       ))}
-      <div className="m-2">（会支持层级嵌套）</div>
+      {/* <div className="m-2">（会支持层级嵌套）</div> */}
+      <form action={create}>
+        <CreateSubmitButton />
+      </form>
     </div>
   )
 }

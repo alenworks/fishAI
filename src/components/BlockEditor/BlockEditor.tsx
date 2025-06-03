@@ -11,6 +11,12 @@ import { TableColumnMenu, TableRowMenu } from '@/extensions/Table/menus'
 import { TextMenu } from '../menus/TextMenu'
 import { ContentItemMenu } from '../menus/ContentItemMenu'
 import { LinkMenu } from '@/components/menus'
+// import debounce from 'lodash.debounce'
+// import { updateDoc } from '@/app/write/[id]/action'
+
+// const saveContent = debounce((uid: string, content: string) => {
+//   updateDoc(uid, { content })
+// }, 1000)
 interface TableContent {
   id: string
 }
@@ -46,7 +52,7 @@ export const BlockEditor = ({
         <EditorContent
           id="editorContent"
           editor={editor}
-          className="h-[calc(100vh-46px)] overflow-y-auto"
+          className="h-[calc(100vh-90px)] overflow-y-auto"
         />
       </div>
       <PanelRightClose onClick={rightSidebar.toggle} />

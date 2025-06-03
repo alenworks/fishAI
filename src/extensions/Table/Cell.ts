@@ -84,42 +84,50 @@ export const TableCell = Node.create<TableCellOptions>({
             const { doc, selection } = state
             const decorations: Decoration[] = []
             const cells = getCellsInColumn(0)(selection)
-
             if (cells) {
-              cells.forEach(({ pos }: { pos: number }, index: number) => {
-                decorations.push(
-                  Decoration.widget(pos + 1, () => {
-                    const rowSelected = isRowSelected(index)(selection)
-                    let className = 'grip-row'
+              cells.forEach(
+                (item: { pos: number; node: any }, index: number) => {
+                  const { pos } = item
+                  decorations.push(
+                    Decoration.widget(pos + 1, () => {
+                      const preRowSpan = cells
+                        .filter((item, i) => i < index)
+                        .reduce((sum, item) => {
+                          const rowspan =
+                            Number(item?.node?.attrs?.rowspan) || 0
+                          return sum + rowspan
+                        }, 0)
+                      const rowSelected = isRowSelected(preRowSpan)(selection)
+                      let className = 'grip-row'
 
-                    if (rowSelected) {
-                      className += ' selected'
-                    }
+                      if (rowSelected) {
+                        className += ' selected'
+                      }
 
-                    if (index === 0) {
-                      className += ' first'
-                    }
+                      if (index === 0) {
+                        className += ' first'
+                      }
 
-                    if (index === cells.length - 1) {
-                      className += ' last'
-                    }
+                      if (index === cells.length - 1) {
+                        className += ' last'
+                      }
 
-                    const grip = document.createElement('a')
+                      const grip = document.createElement('a')
+                      grip.className = className
+                      grip.addEventListener('mousedown', (event) => {
+                        event.preventDefault()
+                        event.stopImmediatePropagation()
 
-                    grip.className = className
-                    grip.addEventListener('mousedown', (event) => {
-                      event.preventDefault()
-                      event.stopImmediatePropagation()
+                        this.editor.view.dispatch(
+                          selectRow(preRowSpan)(this.editor.state.tr)
+                        )
+                      })
 
-                      this.editor.view.dispatch(
-                        selectRow(index)(this.editor.state.tr)
-                      )
+                      return grip
                     })
-
-                    return grip
-                  })
-                )
-              })
+                  )
+                }
+              )
             }
 
             return DecorationSet.create(doc, decorations)

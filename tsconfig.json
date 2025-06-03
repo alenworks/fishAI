@@ -20,7 +20,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "auth": ["./src/auth"]
     }
   },
   "include": [
@@ -28,7 +29,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/pages/_document.js"
+    "src/pages/_document.js",
+    "src/middleware.ts.bak"
   ],
   "exclude": ["node_modules"]
 }

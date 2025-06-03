@@ -58,6 +58,26 @@ export const GROUPS: Group[] = [
         },
       },
       {
+        name: 'heading4',
+        label: 'Heading 4',
+        iconName: 'Heading4',
+        description: 'Low priority section title',
+        aliases: ['h4'],
+        action: (editor) => {
+          editor.chain().focus().setHeading({ level: 4 }).run()
+        },
+      },
+      {
+        name: 'heading5',
+        label: 'Heading 5',
+        iconName: 'Heading5',
+        description: 'Low priority section title',
+        aliases: ['h5'],
+        action: (editor) => {
+          editor.chain().focus().setHeading({ level: 5 }).run()
+        },
+      },
+      {
         name: 'bulletList',
         label: 'Bullet List',
         iconName: 'List',

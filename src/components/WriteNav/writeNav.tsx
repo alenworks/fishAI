@@ -3,13 +3,12 @@ import { Button } from '../ui/button'
 import { Forward, Star } from 'lucide-react'
 import Link from 'next/link'
 interface IProps {
-  workId?: string
+  writeId?: string
 }
 export function WriteNav(props: IProps) {
-  const { workId } = props
+  const { writeId } = props
   return (
     <div className="h-[46px] flex flex-auto text-secondary-foreground my-1 mx-3 bg-ground pb-1 border-b">
-      {workId}
       <div className="text-start inline-flex items-center">
         <Logo />
         <div className="pl-4">
@@ -17,7 +16,7 @@ export function WriteNav(props: IProps) {
             {/* shadcn-ui 有 breadcrumb 组件，到时看是否用上 */}
             <Link href="/write/0">
               文档1
-            </Link> / 文档2 / 文档3
+            </Link> / 文档2 / 文档{writeId}
           </span>
         </div>
       </div>

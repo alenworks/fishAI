@@ -118,7 +118,7 @@ export const ExtensionKit = ({}: ExtensionKitProps) => [
           .chain()
           .setImageBlockAt({
             pos: currentEditor.state.selection.anchor,
-            src: url,
+            src: '',
           })
           .focus()
           .run()

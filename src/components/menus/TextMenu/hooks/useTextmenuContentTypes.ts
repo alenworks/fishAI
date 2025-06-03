@@ -79,6 +79,38 @@ export const useTextmenuContentTypes = (editor: Editor) => {
         type: 'option',
       },
       {
+        icon: 'Heading4',
+        onClick: () =>
+          ctx.editor
+            .chain()
+            .focus()
+            .lift('taskItem')
+            .liftListItem('listItem')
+            .setHeading({ level: 4 })
+            .run(),
+        id: 'heading4',
+        disabled: () => !ctx.editor.can().setHeading({ level: 4 }),
+        isActive: () => ctx.editor.isActive('heading', { level: 4 }),
+        label: 'Heading 4',
+        type: 'option',
+      },
+      {
+        icon: 'Heading5',
+        onClick: () =>
+          ctx.editor
+            .chain()
+            .focus()
+            .lift('taskItem')
+            .liftListItem('listItem')
+            .setHeading({ level: 5 })
+            .run(),
+        id: 'heading5',
+        disabled: () => !ctx.editor.can().setHeading({ level: 5 }),
+        isActive: () => ctx.editor.isActive('heading', { level: 5 }),
+        label: 'Heading 5',
+        type: 'option',
+      },
+      {
         type: 'category',
         label: 'Lists',
         id: 'lists',

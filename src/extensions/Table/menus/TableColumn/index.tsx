@@ -6,7 +6,6 @@ import { Toolbar } from '@/components/ui/Toolbar'
 import { isColumnGripSelected } from './utils'
 import { Icon } from '@/components/ui/Icon'
 import { MenuProps, ShouldShowProps } from '@/components/menus/types'
-
 export const TableColumnMenu = React.memo(
   ({ editor, appendTo }: MenuProps): JSX.Element => {
     const shouldShow = useCallback(

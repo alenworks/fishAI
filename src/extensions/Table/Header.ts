@@ -49,7 +49,13 @@ export const TableHeader = TiptapTableHeader.extend({
               cells.forEach(({ pos }: { pos: number }, index: number) => {
                 decorations.push(
                   Decoration.widget(pos + 1, () => {
-                    const colSelected = isColumnSelected(index)(selection)
+                    const preColSpan = cells
+                      .filter((item, i) => i < index)
+                      .reduce((sum, item) => {
+                        const colspan = Number(item?.node?.attrs?.colspan) || 0
+                        return sum + colspan
+                      }, 0)
+                    const colSelected = isColumnSelected(preColSpan)(selection)
                     let className = 'grip-column'
 
                     if (colSelected) {
@@ -72,7 +78,7 @@ export const TableHeader = TiptapTableHeader.extend({
                       event.stopImmediatePropagation()
 
                       this.editor.view.dispatch(
-                        selectColumn(index)(this.editor.state.tr)
+                        selectColumn(preColSpan)(this.editor.state.tr)
                       )
                     })
 

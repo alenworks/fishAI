@@ -46,7 +46,7 @@ export const TableOfContents = memo(
           top:
             element.getBoundingClientRect().top +
             scrollableContainer.scrollTop -
-            64,
+            95,
           behavior: 'smooth',
         })
         onItemClick?.()
