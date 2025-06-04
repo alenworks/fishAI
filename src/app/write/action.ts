@@ -14,7 +14,6 @@ export async function firstDoc() {
 
     let pathname = '/write/0'
     if (firstDoc !== null) pathname = `/write/${firstDoc?.id}`
-    console.log(pathname)
     redirect(pathname)
   } catch (ex) {
     console.error(ex)
