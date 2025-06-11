@@ -2,9 +2,8 @@ import { DropdownButton } from '@/components/ui/Dropdown'
 import { Icon } from '@/components/ui/Icon'
 import { Surface } from '@/components/ui/Surface'
 import { Toolbar } from '@/components/ui/Toolbar'
-import { languages, tones } from '@/lib/constants'
+import { tones } from '@/lib/constants'
 import * as Dropdown from '@radix-ui/react-dropdown-menu'
-import type { Language } from '@/extensions/Ai'
 import { useCallback } from 'react'
 
 export type AIDropdownProps = {
@@ -14,7 +13,6 @@ export type AIDropdownProps = {
   onMakeLonger: () => void
   onEmojify: () => void
   onTldr: () => void
-  onTranslate: (language: Language) => void
   onTone: (tone: string) => void
   onCompleteSentence: () => void
 }
@@ -28,13 +26,8 @@ export const AIDropdown = ({
   onSimplify,
   onTldr,
   onTone,
-  onTranslate,
 }: AIDropdownProps) => {
   const handleTone = useCallback((tone: string) => () => onTone(tone), [onTone])
-  const handleTranslate = useCallback(
-    (language: Language) => () => onTranslate(language),
-    [onTranslate]
-  )
 
   return (
     <Dropdown.Root>
@@ -115,18 +108,6 @@ export const AIDropdown = ({
                 <Icon name="ChevronRight" className="w-4 h-4 ml-auto" />
               </DropdownButton>
             </Dropdown.SubTrigger>
-            <Dropdown.SubContent>
-              <Surface className="flex flex-col min-w-[15rem] p-2 max-h-[20rem] overflow-auto">
-                {languages.map((lang) => (
-                  <Dropdown.Item
-                    onClick={handleTranslate(lang.value)}
-                    key={lang.value}
-                  >
-                    <DropdownButton>{lang.label}</DropdownButton>
-                  </Dropdown.Item>
-                ))}
-              </Surface>
-            </Dropdown.SubContent>
           </Dropdown.Sub>
           <Dropdown.Item onClick={onCompleteSentence}>
             <DropdownButton>

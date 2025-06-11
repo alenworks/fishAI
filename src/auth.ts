@@ -15,6 +15,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   adapter: PrismaAdapter(db) as Adapter,
+  trustHost: true,
   theme: {
     logo: 'https://next-auth.js.org/img/logo/logo-sm.png',
   },

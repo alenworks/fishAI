@@ -107,7 +107,7 @@ export const ExtensionKit = ({}: ExtensionKitProps) => [
       files.forEach(async () => {
         // const url = await API.uploadImage(file)
 
-        currentEditor.chain().setImageBlockAt({ pos, src: url }).focus().run()
+        currentEditor.chain().setImageBlockAt({ pos, src: '' }).focus().run()
       })
     },
     onPaste: (currentEditor, files) => {

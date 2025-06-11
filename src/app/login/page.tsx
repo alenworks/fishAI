@@ -1,12 +1,11 @@
 import Link from 'next/link'
-import { getUserInfo } from '@/lib/session'
+import { auth } from 'auth'
 import { HomeNav } from '@/components/HomeNav'
 import SignOutButton from '@/components/sign-out-button'
 
 export default async function UserTestPage() {
-  const user = await getUserInfo()
-
-  if (user === null)
+  const session = await auth()
+  if (!session?.user)
     return (
       <Wrapper>
         {/* <SignInButton /> */}
