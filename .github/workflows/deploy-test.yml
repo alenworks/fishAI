@@ -16,7 +16,7 @@ jobs:
         env:
           HOSTNAME: ${{secrets.ECS_IP}}
           USER_NAME: ${{secrets.ECS_USER}}
-          PRIVATE_KEY: ${{ secrets.ECS_RSA}}
+          PRIVATE_KEY: ${{secrets.ECS_RSA}}
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
