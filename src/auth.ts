@@ -10,8 +10,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     GitHub,
     Email({
-      server: process.env.EMAIL_SERVER,
-      from: process.env.EMAIL_FROM,
+      server: {
+        host: process.env.EMAIL_SERVER_HOST, // "smtp.163.com"
+        port: Number(process.env.EMAIL_SERVER_PORT), // 25
+        auth: {
+          user: process.env.EMAIL_SERVER_USER, // "13567481362"
+          pass: process.env.EMAIL_SERVER_PASSWORD, // "LxianJIN0311"
+        },
+      },
+      from: process.env.EMAIL_FROM, // "13567481362@163.com"
     }),
   ],
   adapter: PrismaAdapter(db) as Adapter,
