@@ -2,12 +2,30 @@ on:
   push:
     branches:
       - master
+      - staging # 如果有 staging 分支部署需求，保留此项
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+      - name: Install pnpm globally
+        run: npm i pnpm -g
+      - name: Set npm registries for Tiptap
+        run: |
+          npm config set "@tiptap-pro:registry" https://registry.tiptap.dev/
+          npm config set "@tiptap-cloud:registry" https://registry.tiptap.dev/
+          npm config set "//registry.tiptap.dev/:_authToken" "${{ secrets.TIPTAP_AUTH_TOKEN }}"
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+      - name: Generate Prisma schema
+        run: pnpm prisma generate
+      - name: Build project
+        run: pnpm run build
       - name: Deploy to Aliyun Serverless Function AI
         env:
           ACCOUNT_ID: ${{ secrets.ACCOUNT_ID }}
@@ -15,17 +33,10 @@ jobs:
           ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
           ACCESS_KEY_SECRET: ${{ secrets.ACCESS_KEY_SECRET }}
         run: |
-          npm i pnpm -g
-          npm config set "@tiptap-pro:registry" https://registry.tiptap.dev/
-          npm config set "@tiptap-cloud:registry" https://registry.tiptap.dev/
-          npm config set "//registry.tiptap.dev/:_authToken" "${{ secrets.TIPTAP_AUTH_TOKEN }}"
-          pnpm i --frozen-lockfile
-          pnpm prisma generate
-          pnpm run build
           npm install -g @serverless-devs/s
           s config add --AccountID $ACCOUNT_ID --AccessKeyID $ACCESS_KEY_ID --AccessKeySecret $ACCESS_KEY_SECRET -a default
-          if: github.ref == 'refs/heads/master'
-          run: s deploy function --type code --use-local
+          s deploy function --type code --use-local
+        if: github.ref == 'refs/heads/master' # 仅在推送到 master 分支时部署
       - name: Deploy to staging
-        if: github.ref == 'refs/heads/staging'
+        if: github.ref == 'refs/heads/staging' # 仅在推送到 staging 分支时部署到 staging 环境
         run: s deploy function --type code --use-local --env staging
