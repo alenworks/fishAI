@@ -1,0 +1,32 @@
+on:
+  push:
+    branches:
+      - master
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Deploy to Aliyun Serverless Function AI
+        env:
+          ACCOUNT_ID: ${{ secrets.ACCOUNT_ID }}
+          REGION: ap-southeast-1
+          ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+          ACCESS_KEY_SECRET: ${{ secrets.ACCESS_KEY_SECRET }}
+        run: |
+          npm i pnpm -g
+          npm config set "@tiptap-pro:registry" https://registry.tiptap.dev/
+          npm config set "@tiptap-cloud:registry" https://registry.tiptap.dev/
+          npm config set "//registry.tiptap.dev/:_authToken" "${{ secrets.TIPTAP_AUTH_TOKEN }}"
+          pnpm i --frozen-lockfile
+          pnpm prisma generate
+          pnpm run build
+          npm install -g @serverless-devs/s
+          s config add --AccountID $ACCOUNT_ID --AccessKeyID $ACCESS_KEY_ID --AccessKeySecret $ACCESS_KEY_SECRET -a default
+          name: Deploy to production
+          if: github.ref == 'refs/heads/master'
+          run: s deploy function --type code --use-local
+      - name: Deploy to staging
+        if: github.ref == 'refs/heads/staging'
+        run: s deploy function --type code --use-local --env staging
