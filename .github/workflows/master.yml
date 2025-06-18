@@ -24,7 +24,6 @@ jobs:
           pnpm run build
           npm install -g @serverless-devs/s
           s config add --AccountID $ACCOUNT_ID --AccessKeyID $ACCESS_KEY_ID --AccessKeySecret $ACCESS_KEY_SECRET -a default
-          name: Deploy to production
           if: github.ref == 'refs/heads/master'
           run: s deploy function --type code --use-local
       - name: Deploy to staging
