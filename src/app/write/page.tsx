@@ -15,9 +15,8 @@ export default async function Work() {
       },
     })
     if (firstDoc != null) pathname = `/write/${firstDoc?.id}` // 找到第一篇文档，然后跳转过去
+    redirect(pathname)
   }
-
-  redirect(pathname)
 
   return (
     <Wrapper>

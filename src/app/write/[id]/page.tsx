@@ -1,6 +1,6 @@
-import AIEditor from '@/components/BlockEditor'
 import { searchDocById } from './action'
 import Title from './title'
+import Content from './content'
 export default async function Write(props: {
   params: Promise<{ id: string }>
 }) {
@@ -20,7 +20,7 @@ export default async function Write(props: {
   return (
     <>
       <Title id={doc?.id} title={doc?.title} />
-      <AIEditor id={doc?.id} />
+      <Content id={doc?.id} content={doc.content} />
     </>
   )
 }

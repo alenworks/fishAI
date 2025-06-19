@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# huashuiai-web
 
-## Getting Started
+划水 AI 项目 PC 客户端，使用 Next.js 开发。
 
-First, run the development server:
+## 本地运行
 
-```bash
+git clone 项目。
+
+把 `.env.example` 文件复制为 `.env` 文件，并修改内容。
+
+然后执行以下命令：
+
+```
+npm install
+npm run db:push
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 发布到测试环境
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+提交 `test-deploy` 分支到 Github ，会触发 GitHub Action 使用 Docker 部署测试环境
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+注意，其中 `.npmrc` 和 `.env` 文件是在 deploy-test.yml 中动态创建的，内容设置在 GitHub Action Secrets 中
 
-## Learn More
+PS：可参考本地的 `.npmrc` 和 `.env.test` 文件
 
-To learn more about Next.js, take a look at the following resources:
+## 发布到阿里云 FC
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+不同的 git 分支对应不同的环境，把代码提交到该分支，会触发阿里云 FC 应用重新部署。
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- 内测环境 `test-deploy`
+- 预发环境 `preview-test-deploy`
+- 线上环境 `master`

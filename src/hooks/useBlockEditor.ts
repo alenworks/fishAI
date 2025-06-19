@@ -29,6 +29,8 @@ export const useBlockEditor = ({
   ydoc,
   provider,
   onTableContentUpdate,
+  handleUpdate,
+  content,
 }: {
   aiToken?: string
   ydoc: YDoc
@@ -36,10 +38,20 @@ export const useBlockEditor = ({
   userId?: string
   userName?: string
   onTableContentUpdate: (item: TableContent[]) => void
+  handleUpdate: (content: string) => void
+  content: string
 }) => {
   const [collabState, setCollabState] = useState<WebSocketStatus>(
     provider ? WebSocketStatus.Connecting : WebSocketStatus.Disconnected
   )
+
+  function gen_content(rawContent: string) {
+    try {
+      return JSON.parse(rawContent)
+    } catch (error: any) {
+      console.error(error)
+    }
+  }
 
   const editor = useEditor(
     {
@@ -59,6 +71,11 @@ export const useBlockEditor = ({
           ctx.editor.commands.setContent(initialContent)
           ctx.editor.commands.focus('start', { scrollIntoView: true })
         }
+      },
+      content: gen_content(content),
+      onUpdate: ({ editor }) => {
+        const data = editor.getJSON()
+        handleUpdate(JSON.stringify(data))
       },
       extensions: [
         TableOfContents.configure({
