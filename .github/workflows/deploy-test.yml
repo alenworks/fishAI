@@ -26,9 +26,6 @@ jobs:
             git checkout .
             git pull origin test-deploy
             echo '------ git pull done ------' ;
-            # echo "${{ secrets.NPMRC_FOR_TEST }}" > .npmrc
-            # echo "${{ secrets.ENV_FILE_FOR_TEST }}" > .env
-            # echo '------ creat npmrc & env ------' ;
             docker rm $(docker stop $(docker ps -a -q --filter ancestor=fishai-web-docker))
             echo '------ docker rm done ------' ;
             docker build -t fishai-web-docker .
