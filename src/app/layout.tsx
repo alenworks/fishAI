@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { ThemeProvider } from '@/components/ui/theme-provider'
 import localFont from 'next/font/local'
+import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
 const geistSans = localFont({
@@ -36,6 +37,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <Toaster position="top-right" />
         </ThemeProvider>
       </body>
     </html>

@@ -4,6 +4,7 @@ import { LeftSidebar, LeftNav } from '@/components'
 import { WriteNav } from '@/components'
 import { getUserInfo } from '@/lib/session'
 import { signOut } from 'auth'
+
 export default async function Layout(props: {
   children: React.ReactNode
   directory: React.ReactNode
