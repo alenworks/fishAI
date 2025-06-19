@@ -1,5 +1,5 @@
 import { Group } from './types'
-
+import { toast } from 'sonner'
 export const GROUPS: Group[] = [
   // {
   //   name: 'ai',
@@ -160,6 +160,8 @@ export const GROUPS: Group[] = [
               })
               .run()
           } else {
+            console.log(1212)
+            toast.warning('请输入图片连接')
           }
         },
       },
