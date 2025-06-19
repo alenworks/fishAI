@@ -29,7 +29,7 @@ export const GROUPS: Group[] = [
     commands: [
       {
         name: 'heading1',
-        label: 'Heading 1',
+        label: 'Heading 1 标题1',
         iconName: 'Heading1',
         description: 'High priority section title',
         aliases: ['h1'],
@@ -39,7 +39,7 @@ export const GROUPS: Group[] = [
       },
       {
         name: 'heading2',
-        label: 'Heading 2',
+        label: 'Heading 2 标题2',
         iconName: 'Heading2',
         description: 'Medium priority section title',
         aliases: ['h2'],
@@ -49,7 +49,7 @@ export const GROUPS: Group[] = [
       },
       {
         name: 'heading3',
-        label: 'Heading 3',
+        label: 'Heading 3 标题3',
         iconName: 'Heading3',
         description: 'Low priority section title',
         aliases: ['h3'],
@@ -59,7 +59,7 @@ export const GROUPS: Group[] = [
       },
       {
         name: 'heading4',
-        label: 'Heading 4',
+        label: 'Heading 4 标题4',
         iconName: 'Heading4',
         description: 'Low priority section title',
         aliases: ['h4'],
@@ -69,7 +69,7 @@ export const GROUPS: Group[] = [
       },
       {
         name: 'heading5',
-        label: 'Heading 5',
+        label: 'Heading 5 标题5',
         iconName: 'Heading5',
         description: 'Low priority section title',
         aliases: ['h5'],
@@ -79,7 +79,7 @@ export const GROUPS: Group[] = [
       },
       {
         name: 'bulletList',
-        label: 'Bullet List',
+        label: 'Bullet List 列表',
         iconName: 'List',
         description: 'Unordered list of items',
         aliases: ['ul'],
@@ -89,7 +89,7 @@ export const GROUPS: Group[] = [
       },
       {
         name: 'numberedList',
-        label: 'Numbered List',
+        label: 'Numbered List 有序列表',
         iconName: 'ListOrdered',
         description: 'Ordered list of items',
         aliases: ['ol'],
@@ -99,7 +99,7 @@ export const GROUPS: Group[] = [
       },
       {
         name: 'taskList',
-        label: 'Task List',
+        label: 'Task List 任务列表',
         iconName: 'ListTodo',
         description: 'Task list with todo items',
         aliases: ['todo'],
@@ -109,7 +109,7 @@ export const GROUPS: Group[] = [
       },
       {
         name: 'toggleList',
-        label: 'Toggle List',
+        label: 'Toggle List 展开列表',
         iconName: 'ListCollapse',
         description: 'Toggles can show and hide content',
         aliases: ['toggle'],
@@ -119,7 +119,7 @@ export const GROUPS: Group[] = [
       },
       {
         name: 'blockquote',
-        label: 'Blockquote',
+        label: 'Blockquote 引用',
         iconName: 'Quote',
         description: 'Element for quoting',
         action: (editor) => {
@@ -128,7 +128,7 @@ export const GROUPS: Group[] = [
       },
       {
         name: 'codeBlock',
-        label: 'Code Block',
+        label: 'Code Block 代码块',
         iconName: 'SquareCode',
         description: 'Code block with syntax highlighting',
         shouldBeHidden: (editor) => editor.isActive('columns'),
@@ -143,8 +143,29 @@ export const GROUPS: Group[] = [
     title: 'Insert',
     commands: [
       {
+        name: 'image',
+        label: 'Image 图片',
+        iconName: 'Image',
+        description: 'Insert an image',
+        aliases: ['img'],
+        action: (editor) => {
+          const url = window.prompt('Image URL')
+          console.log(url)
+          if (url) {
+            editor
+              .chain()
+              .focus()
+              .setImageBlock({
+                src: url,
+              })
+              .run()
+          } else {
+          }
+        },
+      },
+      {
         name: 'table',
-        label: 'Table',
+        label: 'Table 表格',
         iconName: 'Table',
         description: 'Insert a table',
         shouldBeHidden: (editor) => editor.isActive('columns'),
@@ -158,7 +179,7 @@ export const GROUPS: Group[] = [
       },
       {
         name: 'columns',
-        label: 'Columns',
+        label: 'Columns 多列',
         iconName: 'Columns2',
         description: 'Add two column content',
         aliases: ['cols'],
@@ -174,7 +195,7 @@ export const GROUPS: Group[] = [
       },
       {
         name: 'horizontalRule',
-        label: 'Horizontal Rule',
+        label: 'Horizontal Rule 分割线',
         iconName: 'Minus',
         description: 'Insert a horizontal divider',
         aliases: ['hr'],
