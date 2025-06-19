@@ -96,6 +96,7 @@
     "react-hot-toast": "^2.4.1",
     "react-resizable-panels": "^2.1.7",
     "server-only": "^0.0.1",
+    "sonner": "^2.0.5",
     "tailwind-merge": "^2.5.5",
     "tailwindcss": "3.3.3",
     "tailwindcss-animate": "^1.0.7",
