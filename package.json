@@ -104,7 +104,8 @@
     "uuid": "^9.0.1",
     "y-prosemirror": "^1.2.11",
     "yjs": "^13.6.20",
-    "zod": "^3.25.50"
+    "zod": "^3.25.50",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.6.0",

@@ -25,11 +25,15 @@ export const BlockEditor = ({
   aiToken,
   ydoc,
   provider,
+  content,
+  handleUpdate,
 }: {
   aiToken?: string
   hasCollab: boolean
   ydoc: Y.Doc
   provider?: TiptapCollabProvider | null | undefined
+  content: string
+  handleUpdate: (content: string) => void
 }) => {
   const [tableContent, setTableContent] = useState<TableContent[]>([])
   const menuContainerRef = useRef(null)
@@ -39,6 +43,8 @@ export const BlockEditor = ({
     ydoc,
     provider,
     onTableContentUpdate: (items: TableContent[]) => setTableContent(items),
+    handleUpdate,
+    content,
   })
   const rightSidebar = useSidebar()
 

@@ -5,8 +5,14 @@ import { useSearchParams } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { Doc as YDoc } from 'yjs'
 import { BlockEditor } from './BlockEditor'
-export default function AIEditor(props: { id: string }) {
-  const { id } = props
+
+interface AIEditorProps {
+  rawContent: string
+  handleUpdate: (content: string) => void
+  id: string
+}
+export default function AIEditor(props: AIEditorProps) {
+  const { id, handleUpdate, rawContent } = props
   // Resolving the `id` value from the Promise
   const [collabToken, setCollabToken] = useState<string | null>(null)
   const [aiToken, setAiToken] = useState<string | null>(null)
@@ -100,6 +106,8 @@ export default function AIEditor(props: { id: string }) {
       hasCollab={hasCollab}
       ydoc={ydoc}
       provider={provider}
+      handleUpdate={handleUpdate}
+      content={rawContent}
     />
   )
 }
