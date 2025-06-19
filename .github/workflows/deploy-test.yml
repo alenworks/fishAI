@@ -14,6 +14,7 @@ jobs:
           docker run --rm ubuntu:latest bash -c "echo Hello from Ubuntu container on CentOS!"
       - name: create npmrc and env file
         run: |
+          cd ~/fishAI
           echo "${{ secrets.NPMRC_FOR_TEST }}" > .npmrc
           echo "${{ secrets.ENV_FILE_FOR_TEST }}" > .env
       - name: Build & Deploy
