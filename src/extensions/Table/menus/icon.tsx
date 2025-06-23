@@ -10,37 +10,92 @@ import insertRowBottom from '../../../../public/icon/insert-row-bottom.svg' // �
 import insertRowTop from '../../../../public/icon/insert-row-top.svg' // 更新路径
 import mergeCell from '../../../../public/icon/mergeCell.svg' // 更新路径
 import splitCell from '../../../../public/icon/splitCell.svg' // 更新路径
-
+import { cn } from '@/lib/utils'
 export const BgColor = (props) => (
-  <Image {...props} src={bgColor} alt="bgColor" />
+  <Image
+    className={cn('w-4 h-4', props.className)}
+    {...props}
+    src={bgColor}
+    alt="bgColor"
+  />
 )
 export const BorderColor = (props) => (
-  <Image {...props} src={borderColor} alt="borderColor" />
+  <Image
+    className={cn('w-4 h-4', props.className)}
+    {...props}
+    src={borderColor}
+    alt="borderColor"
+  />
 )
 export const DeleteColumn = (props) => (
-  <Image {...props} src={deleteColumn} alt="deleteColumn" />
+  <Image
+    className={cn('w-4 h-4', props.className)}
+    {...props}
+    src={deleteColumn}
+    alt="deleteColumn"
+  />
 )
 export const DeleteRow = (props) => (
-  <Image {...props} src={deleteRow} alt="deleteRow" />
+  <Image
+    className={cn('w-4 h-4', props.className)}
+    {...props}
+    src={deleteRow}
+    alt="deleteRow"
+  />
 )
 export const DeleteTable = (props) => (
-  <Image {...props} src={deleteTable} alt="deleteTable" />
+  <Image
+    className={cn('w-4 h-4', props.className)}
+    {...props}
+    src={deleteTable}
+    alt="deleteTable"
+  />
 )
 export const InsertColumnLeft = (props) => (
-  <Image {...props} src={insertColumnLeft} alt="insertColumnLeft" />
+  <Image
+    className={cn('w-4 h-4', props.className)}
+    {...props}
+    src={insertColumnLeft}
+    alt="insertColumnLeft"
+  />
 )
 export const InsertColumnRight = (props) => (
-  <Image {...props} src={insertColumnRight} alt="insertColumnRight" />
+  <Image
+    className={cn('w-4 h-4', props.className)}
+    {...props}
+    src={insertColumnRight}
+    alt="insertColumnRight"
+  />
 )
 export const InsertRowBottom = (props) => (
-  <Image {...props} src={insertRowBottom} alt="insertRowBottom" />
+  <Image
+    className={cn('w-4 h-4', props.className)}
+    {...props}
+    src={insertRowBottom}
+    alt="insertRowBottom"
+  />
 )
 export const InsertRowTop = (props) => (
-  <Image {...props} src={insertRowTop} alt="insertRowTop" />
+  <Image
+    className={cn('w-4 h-4', props.className)}
+    {...props}
+    src={insertRowTop}
+    alt="insertRowTop"
+  />
 )
 export const MergeCell = (props) => (
-  <Image {...props} src={mergeCell} alt="mergeCell" />
+  <Image
+    className={cn('w-4 h-4', props.className)}
+    {...props}
+    src={mergeCell}
+    alt="mergeCell"
+  />
 )
 export const SplitCell = (props) => (
-  <Image {...props} src={splitCell} alt="splitCell" />
+  <Image
+    className={cn('w-4 h-4', props.className)}
+    {...props}
+    src={splitCell}
+    alt="splitCell"
+  />
 )

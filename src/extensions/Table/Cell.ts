@@ -66,14 +66,14 @@ export const TableCell = Node.create<TableCellOptions>({
       //   default: null,
       // },
       backgroundColor: {
-        default: '#fff',
+        default: '',
         parseHTML: (element) => {
           const style = element.getAttribute('style')
           if (style) {
             const styleObject = parseStyle(style)
             return styleObject['background-color']
           }
-          return '#fff'
+          return ''
         },
         renderHTML: (attributes) => {
           return {

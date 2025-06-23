@@ -1,7 +1,6 @@
 import DropDownTextAlign from '../component/DropDownTextAlign'
 import { MenuProps, ShouldShowProps } from '@/types/components'
 import { BubbleMenu as BaseBubbleMenu } from '@tiptap/react'
-import { Button } from '@/components/ui/button'
 import {
   Popover,
   PopoverContent,
@@ -43,31 +42,17 @@ export const TableCellMenu = React.memo(
       {
         key: '1',
         label: (
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button onClick={mergeCells}>
-                <MergeCell style={{ fontSize: 16 }} />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent>
-              <p>合并单元格</p>
-            </PopoverContent>
-          </Popover>
+          <MemoButton tooltip="合并单元格" onClick={mergeCells}>
+            <MergeCell style={{ fontSize: 16 }} />
+          </MemoButton>
         ),
       },
       {
         key: '4',
         label: (
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button onClick={splitCells}>
-                <SplitCell style={{ fontSize: 16 }} />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent>
-              <p>拆分单元格</p>
-            </PopoverContent>
-          </Popover>
+          <MemoButton tooltip="拆分单元格" onClick={splitCells}>
+            <SplitCell style={{ fontSize: 16 }} />
+          </MemoButton>
         ),
       },
       {
