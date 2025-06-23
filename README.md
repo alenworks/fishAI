@@ -1,4 +1,4 @@
-# huashuiai-web
+# doublefishai-web
 
 划水 AI 项目 PC 客户端，使用 Next.js 开发。
 
@@ -6,9 +6,7 @@
 
 git clone 项目。
 
-把 `.env.example` 文件复制为 `.env` 文件，并修改内容。
-
-然后执行以下命令：
+执行以下命令：
 
 ```
 npm install
