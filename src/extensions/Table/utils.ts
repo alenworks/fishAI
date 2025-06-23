@@ -1,7 +1,7 @@
 import { findParentNode } from '@tiptap/core'
+import { Node, ResolvedPos } from '@tiptap/pm/model'
 import { Selection, Transaction } from '@tiptap/pm/state'
 import { CellSelection, Rect, TableMap } from '@tiptap/pm/tables'
-import { Node, ResolvedPos } from '@tiptap/pm/model'
 
 export const isRectSelected = (rect: Rect) => (selection: CellSelection) => {
   const map = TableMap.get(selection.$anchorCell.node(-1))
@@ -207,10 +207,8 @@ const select =
   (type: 'row' | 'column') => (index: number) => (tr: Transaction) => {
     const table = findTable(tr.selection)
     const isRowSelection = type === 'row'
-
     if (table) {
       const map = TableMap.get(table.node)
-
       // Check if the index is valid
       if (index >= 0 && index < (isRowSelection ? map.height : map.width)) {
         const left = isRowSelection ? 0 : index
@@ -234,7 +232,6 @@ const select =
                 right,
                 bottom,
               })
-
         const head = table.start + cellsInFirstRow[0]
         const anchor = table.start + cellsInLastRow[cellsInLastRow.length - 1]
         const $head = tr.doc.resolve(head)
@@ -267,4 +264,17 @@ export const selectTable = (tr: Transaction) => {
   }
 
   return tr
+}
+
+export const parseStyle = (styleString: string) => {
+  const styleObject: { [key: string]: string } = {}
+  if (styleString) {
+    styleString.split(';').forEach((item) => {
+      const [key, value] = item.split(':').map((s) => s.trim())
+      if (key && value) {
+        styleObject[key] = value
+      }
+    })
+  }
+  return styleObject
 }

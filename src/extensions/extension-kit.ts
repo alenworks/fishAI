@@ -46,6 +46,7 @@ import {
   TaskItem,
   TaskList,
   UniqueID,
+  ImageUpload,
 } from '.'
 
 import { isChangeOrigin } from '@tiptap/extension-collaboration'
@@ -101,6 +102,7 @@ export const ExtensionKit = ({}: ExtensionKitProps) => [
   CharacterCount.configure({ limit: 50000 }),
   TableOfContents,
   ImageBlock,
+  ImageUpload,
   FileHandler.configure({
     allowedMimeTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp'],
     onDrop: (currentEditor, files, pos) => {

@@ -5,24 +5,27 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import { Toolbar } from '@/components/ui/Toolbar'
 import React, { useCallback } from 'react'
 import {
   BgColor,
   BorderColor,
-  DeleteColumn,
+  DeleteTable,
   InsertColumnLeft,
   InsertColumnRight,
+  InsertRowBottom,
+  InsertRowTop,
   MergeCell,
   SplitCell,
 } from '../icon'
-import { isColumnGripSelected } from './utils'
+import { Surface } from '@/components/ui/Surface'
+import { isAllTableSelected } from './utils'
 import DropDownTextAlign from '../component/DropDownTextAlign'
 import { ColorPicker } from '@/components/panels'
-import { Toolbar } from '@/components/ui/Toolbar'
-import { Surface } from '@/components/ui/Surface'
 const MemoColorPicker = React.memo(ColorPicker)
 const MemoButton = React.memo(Toolbar.Button)
-export const TableColumnMenu = React.memo(
+
+export const TableMenu = React.memo(
   ({ editor, appendTo }: MenuProps): JSX.Element => {
     const onAddColumnBefore = useCallback(() => {
       editor.chain().focus().addColumnBefore().run()
@@ -32,8 +35,16 @@ export const TableColumnMenu = React.memo(
       editor.chain().focus().addColumnAfter().run()
     }, [editor])
 
-    const onDeleteColumn = useCallback(() => {
-      editor.chain().focus().deleteColumn().run()
+    const onAddRowBefore = useCallback(() => {
+      editor.chain().focus().addRowBefore().run()
+    }, [editor])
+
+    const onAddRowAfter = useCallback(() => {
+      editor.chain().focus().addRowAfter().run()
+    }, [editor])
+
+    const onDeleteTable = useCallback(() => {
+      editor.chain().focus().deleteTable().run()
     }, [editor])
 
     const mergeCells = useCallback(() => {
@@ -63,7 +74,7 @@ export const TableColumnMenu = React.memo(
         key: '1',
         icon: '',
         label: (
-          <MemoButton title="前加一列" onClick={onAddColumnBefore}>
+          <MemoButton tooltip="前加一列" onClick={onAddColumnBefore}>
             <InsertColumnLeft style={{ fontSize: 16 }} />
           </MemoButton>
         ),
@@ -72,25 +83,42 @@ export const TableColumnMenu = React.memo(
         key: '2',
         icon: '',
         label: (
-          <MemoButton title="后加一列" onClick={onAddColumnAfter}>
+          <MemoButton tooltip="后加一列" onClick={onAddColumnAfter}>
             <InsertColumnRight style={{ fontSize: 16 }} />
           </MemoButton>
         ),
       },
-
+      {
+        key: '8',
+        icon: '',
+        label: (
+          <MemoButton tooltip="上加一行" onClick={onAddRowBefore}>
+            <InsertRowTop style={{ fontSize: 16 }} />
+          </MemoButton>
+        ),
+      },
+      {
+        key: '9',
+        icon: '',
+        label: (
+          <MemoButton tooltip="下加一行" onClick={onAddRowAfter}>
+            <InsertRowBottom style={{ fontSize: 16 }} />
+          </MemoButton>
+        ),
+      },
       {
         key: '3',
         icon: '',
         label: (
-          <MemoButton title="删除列" onClick={onDeleteColumn}>
-            <DeleteColumn style={{ fontSize: 16 }} />
+          <MemoButton tooltip="删除表格" onClick={onDeleteTable}>
+            <DeleteTable style={{ fontSize: 16 }} />
           </MemoButton>
         ),
       },
       {
         key: '4',
         label: (
-          <MemoButton title="合并单元格" onClick={mergeCells}>
+          <MemoButton tooltip="合并单元格" onClick={mergeCells}>
             <MergeCell style={{ fontSize: 16 }} />
           </MemoButton>
         ),
@@ -98,7 +126,7 @@ export const TableColumnMenu = React.memo(
       {
         key: '5',
         label: (
-          <MemoButton title="拆分单元格" onClick={splitCells}>
+          <MemoButton tooltip="拆分单元格" onClick={splitCells}>
             <SplitCell style={{ fontSize: 16 }} />
           </MemoButton>
         ),
@@ -109,7 +137,7 @@ export const TableColumnMenu = React.memo(
         label: (
           <Popover>
             <PopoverTrigger asChild>
-              <MemoButton tooltip="背景色">
+              <MemoButton tooltip="设置背景颜色">
                 <BgColor style={{ fontSize: 16 }} />
               </MemoButton>
             </PopoverTrigger>
@@ -148,7 +176,7 @@ export const TableColumnMenu = React.memo(
         ),
       },
       {
-        key: '8',
+        key: '3',
         icon: '',
         label: <DropDownTextAlign editor={editor} />,
       },
@@ -159,7 +187,7 @@ export const TableColumnMenu = React.memo(
         if (!state) {
           return false
         }
-        return isColumnGripSelected({ editor, view, state, from: from || 0 })
+        return isAllTableSelected({ editor, view, state, from: from || 0 })
       },
       [editor]
     )
@@ -167,7 +195,7 @@ export const TableColumnMenu = React.memo(
     return (
       <BaseBubbleMenu
         editor={editor}
-        pluginKey="tableColumnMenu"
+        pluginKey="tableMenu"
         updateDelay={0}
         tippyOptions={{
           appendTo: () => {
@@ -200,6 +228,6 @@ export const TableColumnMenu = React.memo(
   }
 )
 
-TableColumnMenu.displayName = 'TableColumnMenu'
+TableMenu.displayName = 'TableMenu'
 
-export default TableColumnMenu
+export default TableMenu
