@@ -1,9 +1,9 @@
-import { Editor } from '@tiptap/react'
 import { EditorState } from '@tiptap/pm/state'
 import { EditorView } from '@tiptap/pm/view'
+import { Editor } from '@tiptap/react'
 
+import { Table } from '../../Table'
 import { isTableSelected } from '../../utils'
-import { Table } from '../..'
 
 export const isColumnGripSelected = ({
   editor,
@@ -16,10 +16,9 @@ export const isColumnGripSelected = ({
   state: EditorState
   from: number
 }) => {
-  const domAtPos = view.domAtPos(from).node as HTMLElement
-  const nodeDOM = view.nodeDOM(from) as HTMLElement
+  const domAtPos = view?.domAtPos(from)?.node as HTMLElement
+  const nodeDOM = view?.nodeDOM(from) as HTMLElement
   const node = nodeDOM || domAtPos
-
   if (
     !editor.isActive(Table.name) ||
     !node ||

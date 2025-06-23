@@ -1,9 +1,7 @@
 import { mergeAttributes, Node } from '@tiptap/core'
 import { Plugin } from '@tiptap/pm/state'
 import { Decoration, DecorationSet } from '@tiptap/pm/view'
-
-import { getCellsInColumn, isRowSelected, selectRow } from './utils'
-
+import { getCellsInColumn, isRowSelected, parseStyle, selectRow } from './utils'
 export interface TableCellOptions {
   HTMLAttributes: Record<string, any>
 }
@@ -64,8 +62,58 @@ export const TableCell = Node.create<TableCellOptions>({
           return value
         },
       },
-      style: {
-        default: null,
+      // style: {
+      //   default: null,
+      // },
+      backgroundColor: {
+        default: '#fff',
+        parseHTML: (element) => {
+          const style = element.getAttribute('style')
+          if (style) {
+            const styleObject = parseStyle(style)
+            return styleObject['background-color']
+          }
+          return '#fff'
+        },
+        renderHTML: (attributes) => {
+          return {
+            style: `background-color: ${attributes.backgroundColor}`,
+          }
+        },
+      },
+      border: {
+        default: '1px solid rgb(222,222,222)',
+        parseHTML: (element) => {
+          const style = element.getAttribute('style')
+          if (style) {
+            const styleObject = parseStyle(style)
+            return styleObject.border
+          }
+          return '1px solid rgb(222,222,222)'
+        },
+        renderHTML: (attributes) => {
+          return {
+            style: `border: ${attributes.border};`,
+          }
+        },
+      },
+      verticalAlign: {
+        default: '',
+        parseHTML: (element) => {
+          const style = element.getAttribute('style')
+          if (style) {
+            const styleObject = parseStyle(style)
+            return styleObject['vertical-align']
+          }
+          return ''
+        },
+        renderHTML: (attributes) => {
+          if (attributes.verticalAlign) {
+            return {
+              style: `vertical-align: ${attributes.verticalAlign};`,
+            }
+          }
+        },
       },
     }
   },

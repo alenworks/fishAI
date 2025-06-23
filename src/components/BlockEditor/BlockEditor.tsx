@@ -7,7 +7,12 @@ import * as Y from 'yjs'
 import { TiptapCollabProvider } from '@hocuspocus/provider'
 import '@/styles/index.css'
 import { ColumnsMenu } from '@/extensions/MultiColumn/menus'
-import { TableColumnMenu, TableRowMenu } from '@/extensions/Table/menus'
+import {
+  TableColumnMenu,
+  TableRowMenu,
+  TableMenu,
+  TableCellMenu,
+} from '@/extensions/Table/menus'
 import { TextMenu } from '../menus/TextMenu'
 import { ContentItemMenu } from '../menus/ContentItemMenu'
 import { LinkMenu } from '@/components/menus'
@@ -70,10 +75,13 @@ export const BlockEditor = ({
           items={tableContent}
         />
       </div>
+
       <ContentItemMenu editor={editor} />
       <LinkMenu editor={editor} appendTo={menuContainerRef} />
       <TextMenu editor={editor} />
       <ColumnsMenu editor={editor} appendTo={menuContainerRef} />
+      <TableMenu editor={editor} appendTo={menuContainerRef} />
+      <TableCellMenu editor={editor} appendTo={menuContainerRef} />
       <TableRowMenu editor={editor} appendTo={menuContainerRef} />
       <TableColumnMenu editor={editor} appendTo={menuContainerRef} />
     </div>

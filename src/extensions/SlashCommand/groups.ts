@@ -1,5 +1,4 @@
 import { Group } from './types'
-import { toast } from 'sonner'
 export const GROUPS: Group[] = [
   // {
   //   name: 'ai',
@@ -149,20 +148,7 @@ export const GROUPS: Group[] = [
         description: 'Insert an image',
         aliases: ['img'],
         action: (editor) => {
-          const url = window.prompt('Image URL')
-          console.log(url)
-          if (url) {
-            editor
-              .chain()
-              .focus()
-              .setImageBlock({
-                src: url,
-              })
-              .run()
-          } else {
-            console.log(1212)
-            toast.warning('请输入图片连接')
-          }
+          editor.chain().focus().setImageUpload().run()
         },
       },
       {
