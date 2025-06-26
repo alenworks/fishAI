@@ -9,6 +9,7 @@ import { ossClient } from '@/lib/oss'
 
 export async function POST(req: Request) {
   const user = await getUserInfo()
+  console.log(user, 'user')
   if (user == null) return Response.json(genUnAuthData())
 
   const formData = await req.formData()

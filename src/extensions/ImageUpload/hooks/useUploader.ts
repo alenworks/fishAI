@@ -9,8 +9,8 @@ const useUploader = ({ onUpload }: { onUpload: (url: string) => void }) => {
     async (file: File) => {
       setLoading(true)
       try {
-        console.log(file)
         const url = await uploadImageFn(file) // 上传图片
+        console.log(url)
         onUpload(url) // 上传成功后，调用 onUpload 方法
       } catch (errPayload: any) {
         console.error(errPayload)

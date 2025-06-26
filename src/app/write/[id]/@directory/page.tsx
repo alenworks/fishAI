@@ -1,13 +1,12 @@
-import { create, search, searchByFilter } from './action'
+import { create, search } from './action'
 import CreateSubmitButton from './CreateSubmitButton'
 import Item from './item'
 export default async function Directory(props: { params: any }) {
   const params = await props.params
   const docRes = await search()
-  const resByFilter = await searchByFilter('文档')
-  const { id } = params
+  // const resByFilter = await searchByFilter('文档')
+  // const { id } = params
 
-  console.log(docRes, resByFilter, id)
   return (
     <div className=" h-[800px]">
       {docRes.map((item) => (
