@@ -8,7 +8,7 @@ export default async function Directory(props: { params: any }) {
   // const { id } = params
 
   return (
-    <div className=" h-[800px]">
+    <div className="h-[800px]">
       {docRes.map((item) => (
         <Item
           key={item.id}
