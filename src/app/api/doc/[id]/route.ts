@@ -14,7 +14,7 @@ export async function GET(
   const user = await getUserInfo()
   if (user == null) return Response.json(genUnAuthData())
 
-  const { id } = await params
+  const { id } = params // 不需要加 `await`
   const doc = await db.doc.findUnique({
     where: { id, userId: user.id },
   })
@@ -30,7 +30,7 @@ export async function PATCH(
   const user = await getUserInfo()
   if (user == null) return Response.json(genUnAuthData())
 
-  const { id } = await params
+  const { id } = params // 不需要加 `await`
   const body = await request.json()
   try {
     await db.doc.update({
