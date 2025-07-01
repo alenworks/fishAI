@@ -1,5 +1,33 @@
-export async function uploadImageAPI() {
-  // TODO 模拟上传图片，以后会上传到 OSS
-  await new Promise((r) => setTimeout(r, 500))
-  return 'https://source.unsplash.com/8xznAGy4HcY/600x300'
+import imageCompression from 'browser-image-compression'
+
+// 压缩图片的配置，参考文档 https://www.npmjs.com/package/browser-image-compression
+const imageCompressionOptions = {
+  maxSizeMB: 1,
+  maxWidthOrHeight: 1200,
+  useWebWorker: true,
+}
+export async function uploadImageFn(file: File) {
+  const blob = await imageCompression(file, imageCompressionOptions)
+  const compressedFile = new File([blob], file.name)
+  const formData = new FormData()
+  formData.append('file', compressedFile)
+
+  const res = await fetch('/api/upload', {
+    method: 'POST',
+    body: formData,
+  })
+  const dataRes = await res.json()
+  if (dataRes.errno !== 0) {
+    throw new Error('upload error')
+  }
+
+  const { url } = dataRes.data // OSS url
+
+  // 替换 CDN 域名
+  const cdnUrl = url.replace(
+    'http://fish-web-dev.oss-cn-hongkong.aliyuncs.com',
+    'https://file-dev.doublefishesai.cn'
+  )
+
+  return cdnUrl
 }

@@ -7,7 +7,7 @@ import { Image } from '../Image'
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     imageBlock: {
-      setImageBlock: (attributes: { src: string }) => ReturnType
+      setImageBlock: (attributes: { src: string; ratio: number }) => ReturnType
       setImageBlockAt: (attributes: {
         src: string
         pos: number | Range
@@ -41,6 +41,13 @@ export const ImageBlock = Image.extend({
         parseHTML: (element) => element.getAttribute('data-width'),
         renderHTML: (attributes) => ({
           'data-width': attributes.width,
+        }),
+      },
+      ratio: {
+        default: NaN,
+        parseHTML: (element) => element.getAttribute('data-ratio'),
+        renderHTML: (attributes) => ({
+          'data-ratio': attributes.ratio,
         }),
       },
       align: {
@@ -79,7 +86,7 @@ export const ImageBlock = Image.extend({
         ({ commands }) => {
           return commands.insertContent({
             type: 'imageBlock',
-            attrs: { src: attrs.src },
+            attrs: { src: attrs.src, ratio: attrs.ratio },
           })
         },
 

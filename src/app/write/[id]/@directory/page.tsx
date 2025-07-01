@@ -1,23 +1,27 @@
-import { create, search, searchByFilter } from './action'
+import { create, getDocList } from './action'
 import CreateSubmitButton from './CreateSubmitButton'
 import Item from './item'
 export default async function Directory(props: { params: any }) {
   const params = await props.params
-  const docRes = await search()
-  const resByFilter = await searchByFilter('文档')
-  const { id } = params
-
-  console.log(docRes, resByFilter, id)
+  const list = await getDocList()
+  // const resByFilter = await searchByFilter('文档')
+  // const { id } = params
   return (
-    <div className=" h-[800px]">
-      {docRes.map((item) => (
-        <Item
-          key={item.id}
-          id={item.id}
-          title={item.title}
-          isCurrent={item.id === params.id}
-        />
-      ))}
+    <div className="h-[800px]">
+      {list
+        .filter((i) => i.parentId == null) // 顶级目录
+        .map((doc) => {
+          const { id, title } = doc
+          return (
+            <Item
+              key={id}
+              id={id}
+              title={title}
+              paramId={params.id}
+              list={list}
+            />
+          )
+        })}
       {/* <div className="m-2">（会支持层级嵌套）</div> */}
       <form action={create}>
         <CreateSubmitButton />

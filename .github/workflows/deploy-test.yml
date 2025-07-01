@@ -23,7 +23,7 @@ jobs:
             cd ~/fishAI;
             echo "------ cd done ------";
             git checkout test-deploy;
-            git checkout. || true;
+            git checkout . || true;
             git pull origin test-deploy || true;
             echo "------ git pull done ------";
             echo "${{ secrets.NPMRC_FOR_TEST }}" >.npmrc;
