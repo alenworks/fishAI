@@ -16,7 +16,7 @@ export async function create() {
   revalidatePath(`/write/${newDoc.id}`)
 }
 
-export async function search() {
+export async function getDocList() {
   try {
     const user = await getUserInfo()
 
@@ -25,6 +25,7 @@ export async function search() {
       select: {
         id: true,
         title: true,
+        parentId: true,
       },
       where: {
         userId: user.id || '',
@@ -66,7 +67,7 @@ export async function del(id: string) {
     },
   })
 
-  const list = await search()
+  const list = await getDocList()
   const uidList = list.map((doc) => doc.id)
   const otherUid = uidList.find((uid) => uid !== id)
   revalidatePath(`/write/${otherUid}`) // 删除以后，定位到其他文档

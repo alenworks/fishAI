@@ -1,9 +1,9 @@
 import { getUserInfo } from '@/lib/session'
 import { db } from '@/db/db'
-
+import { genSuccessData, genUnAuthData } from '../utils/getResData'
 export async function PATCH(request: Request) {
   const user = await getUserInfo()
-  if (user == null) return Response.json({ errno: 401, msg: 'Unauthorized' })
+  if (user == null) return Response.json(genUnAuthData())
 
   const body = await request.json()
   const { name, avatar } = body
@@ -16,5 +16,5 @@ export async function PATCH(request: Request) {
     },
   })
 
-  return Response.json({ errno: 0 })
+  return Response.json(genSuccessData())
 }

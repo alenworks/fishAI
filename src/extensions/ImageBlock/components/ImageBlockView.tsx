@@ -56,7 +56,6 @@ export const ImageBlockView = (props: ImageBlockViewProps) => {
     }
     setHeight(`${w / node.attrs.ratio}px`) // 根据宽高比例计算高度
   }, [setHeight, node.attrs.width, node.attrs.ratio])
-  console.log(height)
   return (
     <NodeViewWrapper>
       <div
