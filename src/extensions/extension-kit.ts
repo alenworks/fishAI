@@ -1,8 +1,7 @@
 'use client'
 
 import { HocuspocusProvider } from '@hocuspocus/provider'
-
-// import { API } from '@/lib/api'
+import { uploadImageFn } from './utils/api'
 
 import {
   BlockquoteFigure,
@@ -106,25 +105,27 @@ export const ExtensionKit = ({}: ExtensionKitProps) => [
   FileHandler.configure({
     allowedMimeTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp'],
     onDrop: (currentEditor, files, pos) => {
-      files.forEach(async () => {
-        // const url = await API.uploadImage(file)
-
-        currentEditor.chain().setImageBlockAt({ pos, src: '' }).focus().run()
-      })
+      if (files?.length) {
+        files.forEach(async (file) => {
+          const url = await uploadImageFn(file)
+          currentEditor.chain().setImageBlockAt({ pos, src: url }).focus().run()
+        })
+      }
     },
     onPaste: (currentEditor, files) => {
-      files.forEach(async () => {
-        // const url = await API.uploadImage(file)
-
-        return currentEditor
-          .chain()
-          .setImageBlockAt({
-            pos: currentEditor.state.selection.anchor,
-            src: '',
-          })
-          .focus()
-          .run()
-      })
+      if (files?.length) {
+        files.forEach(async (file) => {
+          const url = await uploadImageFn(file)
+          currentEditor
+            .chain()
+            .setImageBlockAt({
+              pos: currentEditor.state.selection.anchor,
+              src: url,
+            })
+            .focus()
+            .run()
+        })
+      }
     },
   }),
   TextAlign.extend({

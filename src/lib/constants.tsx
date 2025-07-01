@@ -87,3 +87,5 @@ export const themeColors = [
   '#a5f3fc',
   '#a5b4fc',
 ]
+
+export const CONTENT_WIDTH = 800

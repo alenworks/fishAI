@@ -16,7 +16,7 @@ export async function POST(req: Request) {
   const file = formData.get('file') as File // `file` 是 FormData key
 
   // oss 文件名： `/` 可自动创建文件夹，`uuid()` 用于避免文件名重复
-  const ossFileName = `files/${user.id}/imgs/${uuid()}.${file.name}`
+  const ossFileName = `files/${user.id}/imgs/${uuid()}`
 
   try {
     const result = await ossClient.put(
