@@ -31,7 +31,7 @@ jobs:
             echo "------ create npmrc & env ------";
             docker rm $(docker stop $(docker ps -a -q --filter ancestor=fishai-web-docker)) || true;
             echo "------ docker rm done ------";
-            docker build -t fishai-web-docker. || true;
+            docker build --no-cache -t fishai-web-docker . || true;
             echo "------ docker build done ------";
             docker run -d -p 3001:3000 fishai-web-docker;
             echo "------ docker run done ------";
