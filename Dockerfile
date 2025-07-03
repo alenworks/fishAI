@@ -1,6 +1,6 @@
 # syntax=docker.io/docker/dockerfile:1
 
-FROM node:20-alpine AS base
+FROM node:20 AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -16,7 +16,6 @@ RUN \
   else echo "Lockfile not found." && exit 1; \
   fi
 
-RUN npm install -g npx
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
