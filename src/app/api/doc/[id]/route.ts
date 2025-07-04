@@ -9,12 +9,12 @@ import {
 // 获取单个 doc 内容
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const user = await getUserInfo()
   if (user == null) return Response.json(genUnAuthData())
-
-  const { id } = params // 不需要加 `await`
+  console.log(request)
+  const { id } = await params
   const doc = await db.doc.findUnique({
     where: { id, userId: user.id },
   })
@@ -25,12 +25,12 @@ export async function GET(
 // 更新单个 doc 内容
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const user = await getUserInfo()
   if (user == null) return Response.json(genUnAuthData())
 
-  const { id } = params // 不需要加 `await`
+  const { id } = await params
   const body = await request.json()
   try {
     await db.doc.update({
