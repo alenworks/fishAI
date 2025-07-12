@@ -1,6 +1,6 @@
 # doublefishai-web
 
-划水 AI 项目 PC 客户端，使用 Next.js 开发。
+双鱼 AI 项目 PC 客户端，使用 Next.js 开发。
 
 ## 本地运行
 
