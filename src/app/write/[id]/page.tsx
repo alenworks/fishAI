@@ -1,4 +1,5 @@
 import Content from './(content)/content'
+
 export default async function Write(props: {
   params: Promise<{ id: string }>
 }) {
