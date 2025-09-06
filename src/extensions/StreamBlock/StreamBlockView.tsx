@@ -14,13 +14,11 @@ export const StreamBlockView = ({
 }: NodeViewProps) => {
   const [showAskData, setShowAskData] = useState('')
   const [loading, setLoading] = useState(false)
-  const { problemData } = node.attrs
+  const { messages } = node.attrs
   const hasFetchRef = useRef(false)
-
+  console.log(messages)
   const getAskData = async () => {
-    const messages = [{ role: 'user', content: problemData }]
     hasFetchRef.current = true
-    console.log(1)
 
     // Fetch data only once
     if (hasFetchRef.current) {

@@ -18,7 +18,7 @@ import { ContentItemMenu } from '../menus/ContentItemMenu'
 import { LinkMenu } from '@/components/menus'
 // import debounce from 'lodash.debounce'
 // import { updateDoc } from '@/app/write/[id]/action'
-import AIIsland from '@/components/ai-island'
+import AIIsland from '@/components/AIIsland/ai-island'
 // import emitter from '@/lib/emitter'
 // import { EVENT_KEY_AI_EDIT } from '@/constants'
 // const saveContent = debounce((uid: string, content: string) => {
@@ -78,7 +78,7 @@ export const BlockEditor = ({
         <EditorContent
           id="editorContent"
           editor={editor}
-          className="h-[calc(100vh-110px)] overflow-y-auto pb-3"
+          className="h-full overflow-y-auto pb-3"
         />
         <AIIsland editor={editor} />
       </div>

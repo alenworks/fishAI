@@ -6,11 +6,11 @@ declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     templateCard: {
       setStreamBlock: ({
-        problemData,
+        messages,
         type,
         parentEndPos,
       }: {
-        problemData: string
+        messages: { role: 'user' | 'system' | 'assistant'; content: string }[]
         type?: any
         parentEndPos?: number
       }) => ReturnType
@@ -30,21 +30,38 @@ export const StreamBlock = Node.create({
   //渲染节点的时候节点上所带的属性和方法
   addAttributes() {
     return {
-      problemData: {
-        default: '', // 默认属性为一个空字符串
+      messages: {
+        default: [],
+        parseHTML: (element) => {
+          const messages = element.getAttribute('messages')
+          try {
+            return messages ? JSON.parse(messages) : []
+          } catch {
+            return []
+          }
+        },
+        renderHTML: (attributes) => {
+          return {
+            messages: JSON.stringify(attributes.messages ?? []),
+          }
+        },
       },
       type: {
         default: null,
-      },
-      askData: {
-        default: null,
-        parseHTML() {
-          // 解析时不接收该属性
-          return null
+        parseHTML: (element) => element.getAttribute('type'),
+        renderHTML: (attributes) => {
+          return {
+            type: attributes.type,
+          }
         },
-        renderHTML() {
-          // 渲染时返回 null，不包括 askData
-          return null
+      },
+      customnodeid: {
+        default: null,
+        parseHTML: (element) => element.getAttribute('customnodeid'),
+        renderHTML: (attributes) => {
+          return {
+            customnodeid: attributes.customnodeid,
+          }
         },
       },
     }
@@ -69,7 +86,7 @@ export const StreamBlock = Node.create({
   addCommands() {
     return {
       setStreamBlock:
-        ({ problemData, type, parentEndPos }) =>
+        ({ messages, type, parentEndPos }) =>
         ({ chain }) => {
           if (parentEndPos) {
             return chain()
@@ -78,7 +95,7 @@ export const StreamBlock = Node.create({
                 {
                   type: this.name,
                   attrs: {
-                    problemData: problemData, // 将选中的内容传递给节点属性
+                    messages: messages, // 将选中的内容传递给节点属性
                     type,
                     customnodeid: uuidv4(),
                   },
@@ -91,7 +108,7 @@ export const StreamBlock = Node.create({
               .insertContent({
                 type: this.name,
                 attrs: {
-                  problemData: problemData, // 将选中的内容传递给节点属性
+                  messages: messages, // 将选中的内容传递给节点属性
                   type,
                   customnodeid: uuidv4(),
                 },

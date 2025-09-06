@@ -34,9 +34,7 @@ export function LeftNav({
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize={85}>
-        <div className="h-screen flex flex-col">
-          <div className="flex-1">{content}</div>
-        </div>
+        <div className="h-screen flex flex-col">{content}</div>
       </ResizablePanel>
     </ResizablePanelGroup>
   )
