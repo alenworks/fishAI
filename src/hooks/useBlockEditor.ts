@@ -32,7 +32,6 @@ export const useBlockEditor = ({
   handleUpdate,
   content,
 }: {
-  aiToken?: string
   ydoc: YDoc
   provider?: TiptapCollabProvider | null | undefined
   userId?: string

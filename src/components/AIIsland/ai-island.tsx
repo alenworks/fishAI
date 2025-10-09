@@ -165,12 +165,12 @@ export default function AIIsland({ editor }: { editor: Editor }) {
               总结
               <MoveUpRight className="h-4 w-4" />
             </Button>
-            <Button
+            {/* <Button
               variant="ghost"
               className="p-2 hover:bg-inherit hover:text-muted-foreground"
             >
               更多...
-            </Button>
+            </Button> */}
           </div>
           <div className="flex-auto flex items-center justify-start rounded-2xl p-2 pl-2 sm:pl-4 border shadow w-full">
             <Sparkles size={24} />

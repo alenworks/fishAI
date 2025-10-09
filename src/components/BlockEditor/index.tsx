@@ -102,7 +102,6 @@ export default function AIEditor(props: AIEditorProps) {
 
   return (
     <BlockEditor
-      aiToken={aiToken ?? undefined}
       hasCollab={hasCollab}
       ydoc={ydoc}
       provider={provider}

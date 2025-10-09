@@ -29,13 +29,11 @@ interface TableContent {
 }
 
 export const BlockEditor = ({
-  aiToken,
   ydoc,
   provider,
   content,
   handleUpdate,
 }: {
-  aiToken?: string
   hasCollab: boolean
   ydoc: Y.Doc
   provider?: TiptapCollabProvider | null | undefined
@@ -46,7 +44,6 @@ export const BlockEditor = ({
   const menuContainerRef = useRef(null)
   // 获取编辑器和用户列表
   const { editor, users } = useBlockEditor({
-    aiToken,
     ydoc,
     provider,
     onTableContentUpdate: (items: TableContent[]) => setTableContent(items),
