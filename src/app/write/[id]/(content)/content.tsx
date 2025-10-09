@@ -6,17 +6,16 @@ import { Input } from '@/components/ui/input'
 import TiptapEditor from '@/components/BlockEditor'
 import { getDoc, updateContent, updateTitle } from './action'
 import emitter from '@/lib/emitter'
-
+import { useDocStore } from '@/stores/doc-stores'
 export default function Content(props: { id: string }) {
   const { id } = props
-
+  const { setTitle, title } = useDocStore()
   // loading
   const [loading, setLoading] = useState(true)
 
   // 找不到文章
   const [notFound, setNotFound] = useState(false)
   // 标题
-  const [title, setTitle] = useState('')
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const newTitle = e.target.value
     setTitle(newTitle)
@@ -69,21 +68,23 @@ export default function Content(props: { id: string }) {
   }
 
   return (
-    <>
-      <div className="mb-6 pb-4 px-6 border-b">
+    <div className="flex flex-col h-full">
+      <div className="p-4">
         <Input
           placeholder="请输入标题..."
           value={title}
           onChange={handleChange}
-          className="border-none p-0 text-4xl font-bold focus-visible:ring-transparent"
+          className="border-none text-4xl font-bold focus-visible:ring-transparent md:text-4xl"
         />
         {/* 可能还会再增加其他功能，例如设置 Icon 、背景等 */}
       </div>
-      <TiptapEditor
-        id={id}
-        rawContent={editorContent}
-        handleUpdate={handleUpdate}
-      />
-    </>
+      <div className="flex-1 min-h-0">
+        <TiptapEditor
+          id={id}
+          rawContent={editorContent}
+          handleUpdate={handleUpdate}
+        />
+      </div>
+    </div>
   )
 }

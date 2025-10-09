@@ -46,6 +46,7 @@ import {
   TaskList,
   UniqueID,
   ImageUpload,
+  StreamBlock,
 } from '.'
 
 import { isChangeOrigin } from '@tiptap/extension-collaboration'
@@ -155,6 +156,7 @@ export const ExtensionKit = ({}: ExtensionKitProps) => [
     width: 2,
     class: 'ProseMirror-dropcursor border-black',
   }),
+  StreamBlock,
 ]
 
 export default ExtensionKit

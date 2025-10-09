@@ -18,7 +18,9 @@ import { ContentItemMenu } from '../menus/ContentItemMenu'
 import { LinkMenu } from '@/components/menus'
 // import debounce from 'lodash.debounce'
 // import { updateDoc } from '@/app/write/[id]/action'
-
+import AIIsland from '@/components/AIIsland/ai-island'
+// import emitter from '@/lib/emitter'
+// import { EVENT_KEY_AI_EDIT } from '@/constants'
 // const saveContent = debounce((uid: string, content: string) => {
 //   updateDoc(uid, { content })
 // }, 1000)
@@ -27,13 +29,11 @@ interface TableContent {
 }
 
 export const BlockEditor = ({
-  aiToken,
   ydoc,
   provider,
   content,
   handleUpdate,
 }: {
-  aiToken?: string
   hasCollab: boolean
   ydoc: Y.Doc
   provider?: TiptapCollabProvider | null | undefined
@@ -44,7 +44,6 @@ export const BlockEditor = ({
   const menuContainerRef = useRef(null)
   // 获取编辑器和用户列表
   const { editor, users } = useBlockEditor({
-    aiToken,
     ydoc,
     provider,
     onTableContentUpdate: (items: TableContent[]) => setTableContent(items),
@@ -52,6 +51,19 @@ export const BlockEditor = ({
     content,
   })
   const rightSidebar = useSidebar()
+
+  // 监听 AI island 事件
+  // useEffect(() => {
+  //   function handler(payload: any) {
+  //     if (editor == null) return
+  //     const { content = '', pos = 0 } = payload || {}
+  //     if (!content) return
+
+  //     editor.commands.insertContentAt(pos,content)
+  //   }
+  //   emitter.on(EVENT_KEY_AI_EDIT, handler)
+  //   return () => emitter.off(EVENT_KEY_AI_EDIT, handler) // 及时清除自定义事件
+  // }, [editor])
 
   if (!editor || !users) {
     return <div>Loading...</div>
@@ -63,8 +75,9 @@ export const BlockEditor = ({
         <EditorContent
           id="editorContent"
           editor={editor}
-          className="h-[calc(100vh-90px)] overflow-y-auto"
+          className="h-full overflow-y-auto pb-3"
         />
+        <AIIsland editor={editor} />
       </div>
       <PanelRightClose onClick={rightSidebar.toggle} />
       <div className="max-h-full">

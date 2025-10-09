@@ -104,7 +104,7 @@ export const AIDropdown = ({
             <Dropdown.SubTrigger>
               <DropdownButton>
                 <Icon name="Languages" />
-                Translate
+                翻译
                 <Icon name="ChevronRight" className="w-4 h-4 ml-auto" />
               </DropdownButton>
             </Dropdown.SubTrigger>
