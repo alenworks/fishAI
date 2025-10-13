@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -7,13 +6,14 @@ export async function POST(request: NextRequest) {
 
     console.log('[Next.js API] 收到消息:', messages)
 
-    const koaSSEApiUrl = 'http://localhost:3001/api/ai/chat/stream'
-    const response = await fetch(koaSSEApiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages }),
-    })
-
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/ai/chat/stream`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages }),
+      }
+    )
     if (!response?.ok) {
       return NextResponse.json(
         { error: `Koa 接口错误: ${response.status}` },
