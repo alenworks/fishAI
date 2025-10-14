@@ -13,6 +13,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # ✅ 这里恢复你原来在服务器的 .npmrc 注入逻辑
+      - name: Inject .npmrc
+        run: |
+          echo "${{secrets.NPMRC_FOR_TEST}}" > .npmrc
+          echo "✅ Created .npmrc for private registry"
+
+      # ✅ 可选：打印确认（但不显示敏感内容）
+      - name: Verify .npmrc
+        run: head -n 3 .npmrc || true
+
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
 
