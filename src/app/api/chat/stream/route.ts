@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-
+import { info, error, streamLog } from '@/utils/logger'
 export async function POST(request: NextRequest) {
   try {
     const { messages } = await request.json()
-    console.log('[Next.js API] 收到消息:', messages)
+    info('[Next.js API] 收到消息', messages) // 写入日志
 
     let response: Response
     try {
@@ -16,15 +16,19 @@ export async function POST(request: NextRequest) {
         }
       )
     } catch (err) {
+      const msg = `请求 Koa 接口失败: ${err}`
+      error(msg)
       return NextResponse.json(
-        { process: 'error', content: `请求 Koa 接口失败: ${err}` },
+        { process: 'error', content: msg },
         { status: 200 }
       )
     }
 
     if (!response?.body) {
+      const msg = 'Koa 接口未返回可读流'
+      error(msg)
       return NextResponse.json(
-        { process: 'error', content: 'Koa 接口未返回可读流' },
+        { process: 'error', content: msg },
         { status: 200 }
       )
     }
@@ -46,7 +50,8 @@ export async function POST(request: NextRequest) {
               const parsed = JSON.parse(line.substring(6).trim())
 
               if (parsed.event === 'usage' && !usageSent) {
-                // 只发送一次 token usage
+                // const sseData = { event: 'usage', data: parsed.data };
+                streamLog(`[USAGE] ${JSON.stringify(parsed.data)}`) // 写日志
                 controller.enqueue(
                   new TextEncoder().encode(
                     `event: usage\ndata: ${JSON.stringify(parsed.data)}\n\n`
@@ -56,25 +61,23 @@ export async function POST(request: NextRequest) {
                 continue
               }
 
-              // content 消息累积
               if (parsed.content) accumulatedContent += parsed.content
 
-              // 普通消息透传为 process: 'message'
               if (parsed.content) {
+                const msg = { process: 'message', content: parsed.content }
+                streamLog(`[STREAM MESSAGE] ${parsed.content}`) // 写日志
                 controller.enqueue(
                   new TextEncoder().encode(
-                    `event: message\ndata: ${JSON.stringify({
-                      process: 'message',
-                      content: parsed.content,
-                    })}\n\n`
+                    `event: message\ndata: ${JSON.stringify(msg)}\n\n`
                   )
                 )
               }
             } catch (err) {
-              const errorMsg = `解析 data 错误: ${err}`
+              const errMsg = `解析 data 错误: ${err}`
+              error(errMsg)
               controller.enqueue(
                 new TextEncoder().encode(
-                  `event: error\ndata: ${JSON.stringify({ process: 'error', content: errorMsg })}\n\n`
+                  `event: error\ndata: ${JSON.stringify({ process: 'error', content: errMsg })}\n\n`
                 )
               )
             }
@@ -82,8 +85,8 @@ export async function POST(request: NextRequest) {
         }
       },
       flush(controller) {
-        // 流结束时只发送 done，内容已累积
         const doneMessage = { process: 'done', content: accumulatedContent }
+        streamLog(`[DONE] ${accumulatedContent}`) // 写日志
         controller.enqueue(
           new TextEncoder().encode(
             `event: done\ndata: ${JSON.stringify(doneMessage)}\n\n`
@@ -99,13 +102,11 @@ export async function POST(request: NextRequest) {
         Connection: 'keep-alive',
       },
     })
-  } catch (error) {
-    console.error('[Next.js API 路由异常]', error)
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : err
+    error('[Next.js API 路由异常]', msg)
     return NextResponse.json(
-      {
-        process: 'error',
-        content: error instanceof Error ? error.message : error,
-      },
+      { process: 'error', content: msg },
       { status: 200 }
     )
   }
