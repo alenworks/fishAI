@@ -14,6 +14,8 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({ messages }),
       }
     )
+    console.log('[Next.js API] 返回消息:', response)
+
     if (!response?.ok) {
       return NextResponse.json(
         { error: `Koa 接口错误: ${response.status}` },
