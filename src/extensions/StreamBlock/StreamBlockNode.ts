@@ -22,6 +22,7 @@ export const StreamBlock = Node.create({
   name: 'streamBlock',
   group: 'block',
   atom: true,
+  isolated: true, // 节点独立，方便在保存时排除
   draggable: false,
   //定义节点时，可以通过 addOptions 为节点设置一些默认的属性，这些属性将会在渲染时被使用
   addOptions() {
@@ -68,21 +69,15 @@ export const StreamBlock = Node.create({
   },
 
   parseHTML() {
-    return [
-      {
-        tag: 'streamBlock-component',
-      },
-    ]
+    // 不从 HTML 中解析节点
+    return []
   },
 
   renderHTML({ HTMLAttributes }) {
-    // 获取选中范围的矩形位置
-
-    return [
-      'streamBlock-component',
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-    ]
+    // 不生成可见 HTML，但返回一个空 span 占位，满足类型要求
+    return ['span', mergeAttributes({}, HTMLAttributes), 0]
   },
+
   addCommands() {
     return {
       setStreamBlock:
