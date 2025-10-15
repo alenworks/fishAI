@@ -69,12 +69,12 @@ export const StreamBlock = Node.create({
   },
 
   parseHTML() {
-    // 不从 HTML 中解析节点
+    // 返回空数组，旧数据不会被解析渲染
     return []
   },
 
   renderHTML({ HTMLAttributes }) {
-    // 不生成可见 HTML，但返回一个空 span 占位，满足类型要求
+    // 返回 null 会报类型错，所以返回一个占位 span，不保存到文档内容
     return ['span', mergeAttributes({}, HTMLAttributes), 0]
   },
 
