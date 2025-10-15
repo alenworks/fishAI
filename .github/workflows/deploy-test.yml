@@ -1,4 +1,4 @@
-name: deloy test
+name: Deploy fishAI Web (staging)
 
 on:
   push:
@@ -8,33 +8,49 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Run Ubuntu container
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ✅ 这里恢复你原来在服务器的 .npmrc 注入逻辑
+      - name: Inject .npmrc
         run: |
-          docker run --rm ubuntu:latest bash -c "echo Hello from Ubuntu container on CentOS!"
-      - name: Build & Deploy
+          echo "${{secrets.NPMRC_FOR_TEST}}" > .npmrc
+          echo "✅ Created .npmrc for private registry"
+
+      # ✅ 可选：打印确认（但不显示敏感内容）
+      - name: Verify .npmrc
+        run: head -n 3 .npmrc || true
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          docker build -t fishai-web:staging .
+
+      - name: Save and send image to server
         env:
-          HOSTNAME: ${{secrets.ECS_IP}}
-          USER_NAME: ${{secrets.ECS_USER}}
-          PRIVATE_KEY: ${{secrets.ECS_RSA}}
+          HOST: ${{ secrets.ECS_IP }}
+          USER: ${{ secrets.ECS_USER }}
+          SSH_KEY: ${{ secrets.ECS_RSA }}
         run: |
-          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
-            cd ~/fishAI;
-            echo "------ cd done ------";
-            git checkout test-deploy;
-            git checkout .;
-            git pull origin test-deploy;
-            echo "------ git pull done ------";
-            echo "${{secrets.NPMRC_FOR_TEST}}" >.npmrc;
-            echo "${{secrets.ENV_FILE_FOR_TEST}}" >.env;
-            echo "------ create npmrc & env ------";
-            docker rm $(docker stop $(docker ps -a -q --filter ancestor=fishai-web-docker));
-            echo "------ docker rm done ------";
-            docker build --no-cache -t fishai-web-docker .;
-            echo "------ docker build done ------";
-            docker run -d -p 3001:3000 fishai-web-docker;
-            echo "------ docker run done ------";
+          echo "$SSH_KEY" > private_key && chmod 600 private_key
+          docker save fishai-web:staging | bzip2 | \
+            ssh -o StrictHostKeyChecking=no -i private_key ${USER}@${HOST} \
+            "bunzip2 | docker load"
+
+      - name: Restart container remotely
+        env:
+          HOST: ${{ secrets.ECS_IP }}
+          USER: ${{ secrets.ECS_USER }}
+          SSH_KEY: ${{ secrets.ECS_RSA }}
+        run: |
+          echo "$SSH_KEY" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${USER}@${HOST} '
+            docker compose -f /root/docker-compose.staging.yml up -d fishai-web
           '
-      - name: success
-        run: echo "deploy success"
+
+      - name: Success
+        run: echo "✅ fishAI (Next.js) deployed successfully!"
