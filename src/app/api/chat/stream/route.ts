@@ -1,87 +1,100 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { info, error, streamLog } from '@/utils/logger'
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { messages } = body
+    const { messages } = await request.json()
+    info('[Next.js API] 收到消息', messages) // 写入日志
 
-    console.log('[Next.js API] 收到消息:', messages)
-
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/ai/chat/stream`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages }),
-      }
-    )
-    console.log('[Next.js API] 返回消息:', response)
-
-    if (!response?.ok) {
+    let response: Response
+    try {
+      response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/ai/chat/stream`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages }),
+        }
+      )
+    } catch (err) {
+      const msg = `请求 Koa 接口失败: ${err}`
+      error(msg)
       return NextResponse.json(
-        { error: `Koa 接口错误: ${response.status}` },
-        { status: response.status }
+        { process: 'error', content: msg },
+        { status: 200 }
       )
     }
 
     if (!response?.body) {
+      const msg = 'Koa 接口未返回可读流'
+      error(msg)
       return NextResponse.json(
-        { error: 'Koa 接口未返回可读流' },
-        { status: 500 }
+        { process: 'error', content: msg },
+        { status: 200 }
       )
     }
 
-    // 用于累积所有 dataContent
     let accumulatedContent = ''
+    let usageSent = false
 
     const transformStream = new TransformStream({
       transform(chunk, controller) {
-        const decoder = new TextDecoder()
-        const text = decoder.decode(chunk, { stream: true })
-
+        const text = new TextDecoder().decode(chunk, { stream: true })
         const lines = text.split('\n')
-        let eventType = 'message'
-        let dataContent = ''
 
         for (const line of lines) {
-          if (line.startsWith('event: ')) {
-            eventType = line.substring(7).trim()
-          } else if (line.startsWith('data: ')) {
-            dataContent =
-              JSON.parse(line.substring(6).trim() || '')?.content || ''
+          if (!line.trim()) continue
+          if (line.startsWith('event: ')) continue
+
+          if (line.startsWith('data: ')) {
+            try {
+              const parsed = JSON.parse(line.substring(6).trim())
+
+              if (parsed.event === 'usage' && !usageSent) {
+                // const sseData = { event: 'usage', data: parsed.data };
+                streamLog(`[USAGE] ${JSON.stringify(parsed.data)}`) // 写日志
+                controller.enqueue(
+                  new TextEncoder().encode(
+                    `event: usage\ndata: ${JSON.stringify(parsed.data)}\n\n`
+                  )
+                )
+                usageSent = true
+                continue
+              }
+
+              if (parsed.content) accumulatedContent += parsed.content
+
+              if (parsed.content) {
+                const msg = { process: 'message', content: parsed.content }
+                streamLog(`[STREAM MESSAGE] ${parsed.content}`) // 写日志
+                controller.enqueue(
+                  new TextEncoder().encode(
+                    `event: message\ndata: ${JSON.stringify(msg)}\n\n`
+                  )
+                )
+              }
+            } catch (err) {
+              const errMsg = `解析 data 错误: ${err}`
+              error(errMsg)
+              controller.enqueue(
+                new TextEncoder().encode(
+                  `event: error\ndata: ${JSON.stringify({ process: 'error', content: errMsg })}\n\n`
+                )
+              )
+            }
           }
-        }
-
-        if (dataContent) {
-          // 累积内容
-          accumulatedContent += dataContent
-
-          // 构造当前块
-          const wrapped = {
-            process: eventType,
-            content: dataContent,
-          }
-
-          const sseFormatted = `event: ${eventType}\ndata: ${JSON.stringify(wrapped)}\n\n`
-          controller.enqueue(new TextEncoder().encode(sseFormatted))
         }
       },
-
-      // ✅ 关键：在流结束时调用，发送总结消息
       flush(controller) {
-        console.log('[TransformStream] 流已结束，发送 done 消息')
-
-        const doneMessage = {
-          process: 'done',
-          content: accumulatedContent, // 前面所有 dataContent 的总和
-        }
-
-        const sseFormatted = `event: done\ndata: ${JSON.stringify(doneMessage)}\n\n`
-        controller.enqueue(new TextEncoder().encode(sseFormatted))
-        // controller.close(); // 可选，但通常 flush 后流会自动结束
+        const doneMessage = { process: 'done', content: accumulatedContent }
+        streamLog(`[DONE] ${accumulatedContent}`) // 写日志
+        controller.enqueue(
+          new TextEncoder().encode(
+            `event: done\ndata: ${JSON.stringify(doneMessage)}\n\n`
+          )
+        )
       },
     })
 
-    // 返回代理后的流
     return new NextResponse(response.body.pipeThrough(transformStream), {
       headers: {
         'Content-Type': 'text/event-stream',
@@ -89,8 +102,12 @@ export async function POST(request: NextRequest) {
         Connection: 'keep-alive',
       },
     })
-  } catch (error) {
-    console.error('[Next.js API 路由异常]', error)
-    return NextResponse.json({ error: '服务器内部错误' }, { status: 500 })
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : err
+    error('[Next.js API 路由异常]', msg)
+    return NextResponse.json(
+      { process: 'error', content: msg },
+      { status: 200 }
+    )
   }
 }

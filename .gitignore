@@ -39,3 +39,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .npmrc
+# 忽略日志文件夹及其中所有文件
+logs/*
