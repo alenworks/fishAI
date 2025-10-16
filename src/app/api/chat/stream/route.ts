@@ -50,11 +50,11 @@ export async function POST(request: NextRequest) {
               const parsed = JSON.parse(line.substring(6).trim())
 
               if (parsed.event === 'usage' && !usageSent) {
-                // const sseData = { event: 'usage', data: parsed.data };
+                const sseData = { process: 'usage', content: parsed.data }
                 streamLog(`[USAGE] ${JSON.stringify(parsed.data)}`) // 写日志
                 controller.enqueue(
                   new TextEncoder().encode(
-                    `event: usage\ndata: ${JSON.stringify(parsed.data)}\n\n`
+                    `event: usage\ndata: ${JSON.stringify(sseData)}\n\n`
                   )
                 )
                 usageSent = true
