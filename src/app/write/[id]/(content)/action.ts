@@ -1,29 +1,18 @@
 import debounce from 'lodash.debounce'
-
+import { get, patch } from '@/lib/utils/request'
 export async function getDoc(id: string) {
-  const url = `/api/doc/${id}`
-  const res = await fetch(url)
-  const resData = await res.json()
-  if (resData.errno === 0) {
-    return resData.data
-  } else {
-    return resData.data
-  }
+  const url = `/doc/${id}`
+  const res = await get(url)
+  return res.data
 }
 
 async function updateDoc(
   id: string,
   data: { title?: string; content?: string }
 ) {
-  const url = `/api/doc/${id}`
-  const res = await fetch(url, {
-    method: 'PATCH', // 大写
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  })
-  return res
+  const url = `/doc/${id}`
+  const res = await patch(url, data)
+  return res.data
 }
 
 export const updateTitle = debounce(async (id: string, title: string) => {

@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Sparkles, CornerDownLeft, MoveUpRight } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import type { Editor } from '@tiptap/react'
 import { useAiIslandState } from './useAiIslandState'
 import { useDocStore } from '@/stores/doc-stores'
-
+import { getTokens } from './action'
 export default function AIIsland({ editor }: { editor: Editor }) {
   const [instruction, setInstruction] = useState('')
   const { isVisible } = useAiIslandState(editor)
@@ -43,6 +43,15 @@ export default function AIIsland({ editor }: { editor: Editor }) {
     })
     setInstruction('')
   }
+
+  const getTokenInfo = async () => {
+    const data = await getTokens()
+    console.log('token info', data)
+  }
+
+  useEffect(() => {
+    getTokenInfo()
+  }, [])
 
   return (
     <div
@@ -191,6 +200,7 @@ export default function AIIsland({ editor }: { editor: Editor }) {
               <CornerDownLeft size={24} />
             </Button>
           </div>
+          <span>内容为AI生成请谨慎甄别，您已消耗token:，剩余token：</span>
         </div>
       )}
     </div>

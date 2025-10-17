@@ -1,5 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { info, error, streamLog } from '@/utils/logger'
+import { info, error, streamLog } from '@/lib/utils/logger'
+import { getServerUser } from '../../utils/getServerUser'
+import { db } from '@/db/db'
+async function saveTokenUsage(req: NextRequest, usageData: any) {
+  const user = await getServerUser(req)
+  if (!user) return
+
+  const existing = await db.tokenUseage.findUnique({
+    where: { userId: user.id },
+  })
+
+  if (existing) {
+    await db.tokenUseage.update({
+      where: { userId: user.id },
+      data: {
+        totalTokens: { increment: usageData.total_tokens || 0 },
+        model: usageData.model || 'gpt-3.5-turbo',
+        updatedAt: new Date(),
+      },
+    })
+  } else {
+    await db.tokenUseage.create({
+      data: {
+        userId: user.id,
+        totalTokens: usageData.total_tokens || 0,
+        model: usageData.model || 'gpt-3.5-turbo',
+        tokenlimit: 10000,
+      },
+    })
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { messages } = await request.json()
@@ -8,7 +39,7 @@ export async function POST(request: NextRequest) {
     let response: Response
     try {
       response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/ai/chat/stream`,
+        `${process.env.KOA_PUBLIC_API_BASE_URL}/api/ai/chat/stream`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -52,6 +83,8 @@ export async function POST(request: NextRequest) {
               if (parsed.event === 'usage' && !usageSent) {
                 const sseData = { process: 'usage', content: parsed.data }
                 streamLog(`[USAGE] ${JSON.stringify(parsed.data)}`) // 写日志
+                console.log('Saving token usage:', parsed.data)
+                saveTokenUsage(request, parsed.data)
                 controller.enqueue(
                   new TextEncoder().encode(
                     `event: usage\ndata: ${JSON.stringify(sseData)}\n\n`

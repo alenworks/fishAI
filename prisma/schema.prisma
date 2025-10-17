@@ -28,6 +28,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   docs      Doc[]
+  tokenUseage TokenUseage?
 }
 
 model Account {
@@ -97,4 +98,16 @@ model Doc {
   parent    Doc?     @relation("ChildrenDocs", fields: [parentId], references: [id])
   parentId  String?
   children  Doc[]    @relation("ChildrenDocs")
+}
+
+model TokenUseage {
+  id String @id @default(cuid())
+  userId String @unique
+  model String @default("gpt-3.5-turbo")
+  totalTokens Int @default(0)
+  tokenlimit Int @default(10000)
+  updateLimitAt DateTime @default(now()) @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

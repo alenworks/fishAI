@@ -106,6 +106,7 @@
     "rehype-katex": "^7.0.1",
     "rehype-sanitize": "^6.0.0",
     "remark-math": "^6.0.0",
+    "rotating-file-stream": "^3.2.7",
     "scroll-into-view-if-needed": "^3.1.0",
     "server-only": "^0.0.1",
     "sonner": "^2.0.5",

@@ -1,4 +1,4 @@
-import { info, error } from '@/utils/logger'
+import { info, error } from '@/lib/utils/logger'
 
 export function withLogging(handler: (req: Request) => Promise<Response>) {
   return async (req: Request): Promise<Response> => {
