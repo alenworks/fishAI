@@ -16,7 +16,6 @@ export const StreamBlockView = ({
   const [loading, setLoading] = useState(false)
   const { messages } = node.attrs
   const hasFetchRef = useRef(false)
-  console.log(messages)
   const getAskData = async () => {
     hasFetchRef.current = true
 
