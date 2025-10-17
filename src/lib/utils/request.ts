@@ -1,6 +1,7 @@
 'use client'
 
 import { toast } from 'sonner'
+import type { ApiMap } from '../apiMap'
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
@@ -22,11 +23,18 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
   ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api`
   : '/api'
 
-async function request<T>(
-  method: HttpMethod,
-  path: string,
+/**
+ * 🌟 自动类型推导：
+ * Path 会从 ApiMap 自动推导，返回类型对应 path 对应 method 的 data 类型
+ */
+async function request<
+  Path extends keyof ApiMap,
+  Method extends keyof ApiMap[Path] & HttpMethod,
+>(
+  path: Path,
+  method: Method,
   options: FetchOptions = {}
-): Promise<ApiResponse<T>> {
+): Promise<ApiResponse<ApiMap[Path][Method]>> {
   const {
     params,
     body,
@@ -47,7 +55,7 @@ async function request<T>(
         .join('&')
     : ''
 
-  const url = `${BASE_URL}${path}${queryString}`
+  const url = `${BASE_URL}${String(path)}${queryString}`
 
   const loadingId = showLoading ? toast.loading('加载中...') : undefined
 
@@ -62,12 +70,12 @@ async function request<T>(
       ...rest,
     })
 
-    let data: ApiResponse<T>
+    let data: ApiResponse<ApiMap[Path][Method]>
 
     try {
       data = await res.json()
     } catch {
-      data = { errno: -1, msg: '返回数据解析失败' }
+      data = { errno: -1, msg: '返回数据解析失败' } as any
     }
 
     if (!res.ok) {
@@ -90,24 +98,40 @@ async function request<T>(
   } catch (err: any) {
     console.error('API Error:', err)
     if (showToast) toast.error(err.message || '网络错误，请稍后再试')
-    return { errno: -1, msg: err.message || '网络错误' }
+    return { errno: -1, msg: err.message || '网络错误' } as ApiResponse<
+      ApiMap[Path][Method]
+    >
   } finally {
     if (loadingId) toast.dismiss(loadingId)
   }
 }
 
-// ------------------ 导出方法 ------------------
-export const get = <T>(path: string, options?: FetchOptions) =>
-  request<T>('GET', path, options)
+// ------------------ 封装便捷方法 ------------------
 
-export const post = <T>(path: string, body?: any, options?: FetchOptions) =>
-  request<T>('POST', path, { ...options, body })
+export const get = <Path extends keyof ApiMap>(
+  path: Path,
+  options?: FetchOptions
+) => request(path, 'GET' as any, options as any)
 
-export const put = <T>(path: string, body?: any, options?: FetchOptions) =>
-  request<T>('PUT', path, { ...options, body })
+export const post = <Path extends keyof ApiMap>(
+  path: Path,
+  body?: any,
+  options?: FetchOptions
+) => request(path, 'POST' as any, { ...options, body } as any)
 
-export const patch = <T>(path: string, body?: any, options?: FetchOptions) =>
-  request<T>('PATCH', path, { ...options, body })
+export const put = <Path extends keyof ApiMap>(
+  path: Path,
+  body?: any,
+  options?: FetchOptions
+) => request(path, 'PUT' as any, { ...options, body } as any)
 
-export const del = <T>(path: string, options?: FetchOptions) =>
-  request<T>('DELETE', path, options)
+export const patch = <Path extends keyof ApiMap>(
+  path: Path,
+  body?: any,
+  options?: FetchOptions
+) => request(path, 'PATCH' as any, { ...options, body } as any)
+
+export const del = <Path extends keyof ApiMap>(
+  path: Path,
+  options?: FetchOptions
+) => request(path, 'DELETE' as any, options as any)

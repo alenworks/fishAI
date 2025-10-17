@@ -39,6 +39,31 @@ async function saveTokenUsage(req: NextRequest, usageData: any) {
 
 export async function POST(request: NextRequest) {
   try {
+    const user = await getServerUser(request)
+    if (!user) {
+      return NextResponse.json({ errno: 401, msg: '用户未登录' })
+    }
+
+    // 查询当前 token 使用情况
+    const usageRecord = await db.tokenUseage.findUnique({
+      where: { userId: user.id },
+    })
+
+    let remainingTokens: number
+    if (!usageRecord) {
+      // 第一次请求，默认额度 10000
+      remainingTokens = 10000
+    } else {
+      remainingTokens =
+        (usageRecord.tokenlimit ?? 10000) - (usageRecord.totalTokens ?? 0)
+      if (remainingTokens <= 0) {
+        return NextResponse.json({
+          errno: 403,
+          msg: 'Token 已用完，请充值或等待重置',
+        })
+      }
+    }
+
     const { messages } = await request.json()
     info('[Next.js API] 收到消息', messages)
 
