@@ -27,14 +27,21 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
  * 🌟 自动类型推导：
  * Path 会从 ApiMap 自动推导，返回类型对应 path 对应 method 的 data 类型
  */
-async function request<
-  Path extends keyof ApiMap,
-  Method extends keyof ApiMap[Path] & HttpMethod,
->(
-  path: Path,
-  method: Method,
+
+type MethodResponse<
+  Path extends string,
+  M extends HttpMethod,
+> = Path extends keyof ApiMap
+  ? M extends keyof ApiMap[Path]
+    ? ApiMap[Path][M]
+    : any
+  : any
+
+async function request<M extends HttpMethod, P extends string>(
+  method: M,
+  path: P,
   options: FetchOptions = {}
-): Promise<ApiResponse<ApiMap[Path][Method]>> {
+): Promise<ApiResponse<MethodResponse<P, M>>> {
   const {
     params,
     body,
@@ -61,7 +68,7 @@ async function request<
 
   try {
     const res = await fetch(url, {
-      method,
+      method: method as string,
       headers: {
         'Content-Type': 'application/json',
         ...(headers || {}),
@@ -70,12 +77,11 @@ async function request<
       ...rest,
     })
 
-    let data: ApiResponse<ApiMap[Path][Method]>
-
+    let data: ApiResponse<any>
     try {
       data = await res.json()
     } catch {
-      data = { errno: -1, msg: '返回数据解析失败' } as any
+      data = { errno: -1, msg: '返回数据解析失败' }
     }
 
     if (!res.ok) {
@@ -83,10 +89,9 @@ async function request<
       data.msg = data.msg || res.statusText || '请求失败'
     }
 
-    // 自动 toast 提示
     if (showToast) {
       if (data.errno === 0) {
-        // toast.success(data.msg || '操作成功')
+        // optionally show success
       } else if (data.errno === 401) {
         toast.error(data.msg || '未授权')
       } else if (data.errno !== 0) {
@@ -94,12 +99,13 @@ async function request<
       }
     }
 
-    return data
+    // 类型断言：返回的 data 类型由泛型决定（MethodResponse）
+    return data as ApiResponse<MethodResponse<P, M>>
   } catch (err: any) {
     console.error('API Error:', err)
     if (showToast) toast.error(err.message || '网络错误，请稍后再试')
     return { errno: -1, msg: err.message || '网络错误' } as ApiResponse<
-      ApiMap[Path][Method]
+      MethodResponse<P, M>
     >
   } finally {
     if (loadingId) toast.dismiss(loadingId)
@@ -108,30 +114,26 @@ async function request<
 
 // ------------------ 封装便捷方法 ------------------
 
-export const get = <Path extends keyof ApiMap>(
-  path: Path,
-  options?: FetchOptions
-) => request(path, 'GET' as any, options as any)
+export const get = <P extends string>(path: P, options?: FetchOptions) =>
+  request<'GET', P>('GET', path, options)
 
-export const post = <Path extends keyof ApiMap>(
-  path: Path,
+export const post = <P extends string>(
+  path: P,
   body?: any,
   options?: FetchOptions
-) => request(path, 'POST' as any, { ...options, body } as any)
+) => request<'POST', P>('POST', path, { ...options, body })
 
-export const put = <Path extends keyof ApiMap>(
-  path: Path,
+export const put = <P extends string>(
+  path: P,
   body?: any,
   options?: FetchOptions
-) => request(path, 'PUT' as any, { ...options, body } as any)
+) => request<'PUT', P>('PUT', path, { ...options, body })
 
-export const patch = <Path extends keyof ApiMap>(
-  path: Path,
+export const patch = <P extends string>(
+  path: P,
   body?: any,
   options?: FetchOptions
-) => request(path, 'PATCH' as any, { ...options, body } as any)
+) => request<'PATCH', P>('PATCH', path, { ...options, body })
 
-export const del = <Path extends keyof ApiMap>(
-  path: Path,
-  options?: FetchOptions
-) => request(path, 'DELETE' as any, options as any)
+export const del = <P extends string>(path: P, options?: FetchOptions) =>
+  request<'DELETE', P>('DELETE', path, options)

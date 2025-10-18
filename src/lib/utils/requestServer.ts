@@ -29,18 +29,28 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
   : 'http://localhost:3000/api'
 
 /**
+ * 泛型工具：根据 path 和 method 返回对应类型（若不存在则 any）
+ */
+type MethodResponse<
+  P extends string,
+  M extends HttpMethod,
+> = P extends keyof ApiMap
+  ? M extends keyof ApiMap[P]
+    ? ApiMap[P][M]
+    : any
+  : any
+
+/**
  * 通用请求函数（支持类型自动推导）
  */
-async function requestServer<
-  Path extends keyof ApiMap,
-  Method extends keyof ApiMap[Path] & HttpMethod,
->(
-  path: Path,
-  method: Method,
+async function requestServer<P extends string, M extends HttpMethod>(
+  path: P,
+  method: M,
   options: FetchOptions = {}
-): Promise<ApiResponse<ApiMap[Path][Method]>> {
+): Promise<ApiResponse<MethodResponse<P, M>>> {
   const { params, body, headers, ...rest } = options
 
+  // 拼接查询参数
   const queryString = params
     ? '?' +
       Object.entries(params)
@@ -73,7 +83,7 @@ async function requestServer<
       throw new Error(`HTTP ${res.status}: ${text}`)
     }
 
-    const data = (await res.json()) as ApiResponse<ApiMap[Path][Method]>
+    const data = (await res.json()) as ApiResponse<MethodResponse<P, M>>
 
     if (data.errno !== 0) {
       logError(`[SERVER BUSINESS ERROR] ${method} ${url}`, data.msg)
@@ -88,42 +98,26 @@ async function requestServer<
 }
 
 /** 导出 5 种请求方法（自动推导类型） */
-export const getServer = <Path extends keyof ApiMap>(
-  path: Path,
-  options?: FetchOptions
-) => requestServer(path, 'GET' as keyof ApiMap[Path] & HttpMethod, options)
+export const getServer = <P extends string>(path: P, options?: FetchOptions) =>
+  requestServer(path, 'GET', options)
 
-export const postServer = <Path extends keyof ApiMap>(
-  path: Path,
+export const postServer = <P extends string>(
+  path: P,
   body?: any,
   options?: FetchOptions
-) =>
-  requestServer(path, 'POST' as keyof ApiMap[Path] & HttpMethod, {
-    ...options,
-    body,
-  })
+) => requestServer(path, 'POST', { ...options, body })
 
-export const putServer = <Path extends keyof ApiMap>(
-  path: Path,
+export const putServer = <P extends string>(
+  path: P,
   body?: any,
   options?: FetchOptions
-) =>
-  requestServer(path, 'PUT' as keyof ApiMap[Path] & HttpMethod, {
-    ...options,
-    body,
-  })
+) => requestServer(path, 'PUT', { ...options, body })
 
-export const patchServer = <Path extends keyof ApiMap>(
-  path: Path,
+export const patchServer = <P extends string>(
+  path: P,
   body?: any,
   options?: FetchOptions
-) =>
-  requestServer(path, 'PATCH' as keyof ApiMap[Path] & HttpMethod, {
-    ...options,
-    body,
-  })
+) => requestServer(path, 'PATCH', { ...options, body })
 
-export const delServer = <Path extends keyof ApiMap>(
-  path: Path,
-  options?: FetchOptions
-) => requestServer(path, 'DELETE' as keyof ApiMap[Path] & HttpMethod, options)
+export const delServer = <P extends string>(path: P, options?: FetchOptions) =>
+  requestServer(path, 'DELETE', options)
