@@ -2,6 +2,9 @@ import { NodeViewProps, NodeViewWrapper } from '@tiptap/react'
 import { AnswerComponent } from '@/components/AnswerComponent'
 import { useEffect, useState, useRef } from 'react'
 import { fetchEventSourceFish } from '@/lib/utils/FetchEventSourceAbi'
+import { useAiStore } from '@/stores/ai-stores'
+import { getTokens } from '@/components/AIIsland/action'
+
 // import { EVENT_KEY_AI_EDIT } from '@/constants' // 在这里获取内容宽度，不要直接使用数字
 // import emitter from '@/lib/emitter'
 import md from '@/lib/utils/markDownUse'
@@ -13,10 +16,10 @@ export const StreamBlockView = ({
   updateAttributes,
 }: NodeViewProps) => {
   const [showAskData, setShowAskData] = useState('')
+  const { setToken } = useAiStore()
   const [loading, setLoading] = useState(false)
   const { messages } = node.attrs
   const hasFetchRef = useRef(false)
-  console.log(messages)
   const getAskData = async () => {
     hasFetchRef.current = true
 
@@ -52,6 +55,10 @@ export const StreamBlockView = ({
           setLoading(false)
         },
       })
+      const data = await getTokens()
+      if (data) {
+        setToken({ totalTokens: data.totalTokens, tokenlimit: data.tokenlimit })
+      }
     }
   }
 

@@ -5,7 +5,6 @@ import { useSearchParams } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { Doc as YDoc } from 'yjs'
 import { BlockEditor } from './BlockEditor'
-
 interface AIEditorProps {
   rawContent: string
   handleUpdate: (content: string) => void

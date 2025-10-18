@@ -3,7 +3,7 @@ import { ThemeProvider } from '@/components/ui/theme-provider'
 import localFont from 'next/font/local'
 import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
-import { handleProcessErrors } from '@/utils/logger'
+import { handleProcessErrors } from '@/lib/utils/logger'
 
 if (typeof process !== 'undefined' && process.versions?.node) {
   handleProcessErrors() // ✅ 仅在 Node.js 服务端执行一次

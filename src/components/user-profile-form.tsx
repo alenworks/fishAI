@@ -14,7 +14,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-
+import { patch } from '@/lib/utils/request'
 // Define your form schema.
 const formSchema = z.object({
   email: z.string().email(),
@@ -47,16 +47,7 @@ export function UserProfileForm(props: IProps) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // console.log(values)
 
-    const res = await fetch('/api/user', {
-      body: JSON.stringify({
-        ...values,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      method: 'PATCH',
-    })
-    const data = await res.json()
+    const data = await patch('/user', values)
     // console.log('res data', data)
     if (data.errno === 0) {
       setSuccessStatus(true)

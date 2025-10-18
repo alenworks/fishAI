@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button'
 import type { Editor } from '@tiptap/react'
 import { useAiIslandState } from './useAiIslandState'
 import { useDocStore } from '@/stores/doc-stores'
-
 export default function AIIsland({ editor }: { editor: Editor }) {
   const [instruction, setInstruction] = useState('')
   const { isVisible } = useAiIslandState(editor)
@@ -191,6 +190,7 @@ export default function AIIsland({ editor }: { editor: Editor }) {
               <CornerDownLeft size={24} />
             </Button>
           </div>
+          <span className="text-xs text-zinc-700 text-center">{`内容为AI生成请谨慎甄别`}</span>
         </div>
       )}
     </div>
