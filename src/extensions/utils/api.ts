@@ -12,7 +12,7 @@ export async function uploadImageFn(file: File) {
   const formData = new FormData()
   formData.append('file', compressedFile)
 
-  const dataRes = await post<{ url: string }>('/upload', formData)
+  const dataRes = await post('/upload', formData)
   if (dataRes.errno !== 0) {
     throw new Error('upload error')
   }
