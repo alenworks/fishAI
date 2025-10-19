@@ -22,9 +22,15 @@ export interface ApiMap {
   '/collaboration': {
     POST: Awaited<ReturnType<typeof POST>>['data']
   }
+  '/doc/test-write': {
+    POST: Awaited<ReturnType<typeof POST>>['data']
+  }
   '/doc/[id]': {
     GET: Awaited<ReturnType<typeof GET>>['data']
     PATCH: Awaited<ReturnType<typeof PATCH>>['data']
+  }
+  '/health': {
+    GET: Awaited<ReturnType<typeof GET>>['data']
   }
   '/user': {
     PATCH: Awaited<ReturnType<typeof PATCH>>['data']
