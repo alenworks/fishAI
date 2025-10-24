@@ -5,13 +5,14 @@ import crypto from 'crypto'
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
-  const { id } = params
+  const { id } = context.params
 
   const doc = await db.doc.findUnique({ where: { id } })
-  if (!doc)
+  if (!doc) {
     return NextResponse.json({ error: 'Document not found' }, { status: 404 })
+  }
 
   // 生成随机 token
   const token = crypto.randomBytes(8).toString('hex')
