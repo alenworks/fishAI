@@ -10,14 +10,11 @@ export async function POST(
   const { id } = context.params
 
   const doc = await db.doc.findUnique({ where: { id } })
-  if (!doc) {
+  if (!doc)
     return NextResponse.json({ error: 'Document not found' }, { status: 404 })
-  }
 
-  // 生成随机 token
   const token = crypto.randomBytes(8).toString('hex')
 
-  // 更新文档
   await db.doc.update({
     where: { id },
     data: {
@@ -26,7 +23,6 @@ export async function POST(
     },
   })
 
-  // 返回分享链接
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
   const shareLink = `${baseUrl}/share/${token}`
 
