@@ -47,7 +47,6 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const user = await getServerUser(req)
-    console.log('user', user)
     if (!user) {
       return NextResponse.json(genUnAuthData('用户未登录'))
     }
@@ -64,27 +63,38 @@ export async function POST(req: NextRequest) {
     let result
 
     if (existing) {
-      // ✅ 更新已存在记录
+      // ✅ 如果已存在记录，则扣减剩余额度
+      const newLimit = existing.tokenlimit - tokens
+      if (newLimit < 0) {
+        return NextResponse.json(
+          genErrorData('剩余 Token 不足，请充值或升级额度')
+        )
+      }
+
       result = await db.tokenUseage.update({
         where: { userId },
         data: {
           model,
-          totalTokens: { increment: tokens },
+          totalTokens: { increment: tokens }, // 累计使用总数
+          tokenlimit: newLimit, // 剩余 Token 数
           updatedAt: new Date(),
         },
       })
     } else {
-      // ✅ 创建新记录
-      if (userId) {
-        result = await db.tokenUseage.create({
-          data: {
-            userId,
-            model,
-            totalTokens: tokens,
-            tokenlimit: 10000,
-          },
-        })
+      // ✅ 如果是首次使用，则创建记录，初始额度 10000，扣除本次使用
+      const initLimit = 10000 - tokens
+      if (initLimit < 0) {
+        return NextResponse.json(genErrorData('初始 Token 不足，请调整参数'))
       }
+
+      result = await db.tokenUseage.create({
+        data: {
+          userId,
+          model,
+          totalTokens: tokens, // 累计已用
+          tokenlimit: initLimit, // 剩余 Token
+        },
+      })
     }
 
     return NextResponse.json(genSuccessData(result))

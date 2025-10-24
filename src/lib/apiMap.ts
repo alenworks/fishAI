@@ -19,9 +19,6 @@ export interface ApiMap {
     GET: Awaited<ReturnType<typeof GET>>['data']
     POST: Awaited<ReturnType<typeof POST>>['data']
   }
-  '/collaboration': {
-    POST: Awaited<ReturnType<typeof POST>>['data']
-  }
   '/doc/test-write': {
     POST: Awaited<ReturnType<typeof POST>>['data']
   }

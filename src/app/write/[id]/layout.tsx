@@ -10,7 +10,6 @@ export default async function Layout(props: {
   directory: React.ReactNode
   params: Promise<{ id: string }>
 }) {
-  const params = await props.params
   const user = await getUserInfo()
   const { children, directory } = props
 
@@ -20,7 +19,6 @@ export default async function Layout(props: {
     'use server'
     await signOut()
   }
-  const { id } = params
   return (
     <div className="flex">
       <LeftSidebar user={user} loginout={loginOut} />
@@ -29,7 +27,7 @@ export default async function Layout(props: {
         content={
           <main className="flex flex-1 flex-col h-full min-h-0">
             <div className="flex items-center flex-shrink-0">
-              <WriteNav writeId={id} />
+              <WriteNav />
             </div>
             <div className="flex-1 min-h-0 flex flex-col">{children}</div>
           </main>

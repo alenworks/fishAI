@@ -26,16 +26,27 @@ export default function AIIsland({ editor }: { editor: Editor }) {
   const handleSendMessage = (
     messages: { role: 'user' | 'system' | 'assistant'; content: string }[]
   ) => {
+    const systemPrompt = `
+      你是一名专业的文档工程师。
+      当前文章标题是《${title || '未命名文档'}》。
+      你的任务是根据上下文和用户请求，帮助改进、续写或总结内容。
+
+      输出格式要求：
+      - 保持 Markdown 兼容；
+      - 段落结构清晰；
+      - 保持专业和简洁；
+      - 如果是代码相关主题，请自动使用代码块语法；
+      - 不输出无关说明文字。
+    `
     const basemessages: {
       role: 'user' | 'system' | 'assistant'
       content: string
-    }[] = [
-      { role: 'system', content: `你正在写一篇文章，文章的标题是${title}。` },
-    ]
+    }[] = [{ role: 'system', content: systemPrompt }]
     messages = basemessages.concat(messages)
+
     const { selection } = editor.state
     const { to } = selection
-    console.log(messages)
+
     editor.commands.setStreamBlock({
       messages,
       parentEndPos: to,
@@ -72,7 +83,7 @@ export default function AIIsland({ editor }: { editor: Editor }) {
                   { role: 'assistant', content: limitedText },
                   {
                     role: 'user',
-                    content: `请根据以上内容，续写接下来的内容。200字以内`,
+                    content: `请根据以上内容，续写接下来的内容。500字以内`,
                   },
                 ])
               }}

@@ -2,31 +2,64 @@ import { NextRequest, NextResponse } from 'next/server'
 import { info, error, streamLog } from '@/lib/utils/logger'
 import { getServerUser } from '../../utils/getServerUser'
 import { db } from '@/db/db'
+import { startOfMonth, isBefore } from 'date-fns'
+const defaultLimit = 10000
 
 async function saveTokenUsage(req: NextRequest, usageData: any) {
   try {
     const user = await getServerUser(req)
     if (!user) return
 
+    const usedTokens = usageData.total_tokens || 0
+    const model = usageData.model || 'gpt-3.5-turbo'
+
     const existing = await db.tokenUseage.findUnique({
       where: { userId: user.id },
     })
+
     if (existing) {
+      // ✅ 检查是否进入新月份（自动重置上限）
+      const lastUpdated = existing.updatedAt || new Date()
+      const startOfCurrentMonth = startOfMonth(new Date())
+      const startOfLastUpdatedMonth = startOfMonth(lastUpdated)
+
+      let currentLimit = existing.tokenlimit
+      let totalTokens = existing.totalTokens
+
+      // 如果上次更新时间在上个月，则重置
+      if (isBefore(startOfLastUpdatedMonth, startOfCurrentMonth)) {
+        currentLimit = defaultLimit
+        totalTokens = 0
+      }
+
+      // ✅ 如果额度已用完，则不再更新
+      if (currentLimit <= 0) {
+        info(`[TokenUsage] 用户 ${user.id} 已超出当月额度，跳过更新。`)
+        return
+      }
+
+      // ✅ 计算新的剩余额度
+      const newLimit = Math.max(currentLimit - usedTokens, 0)
+
       await db.tokenUseage.update({
         where: { userId: user.id },
         data: {
-          totalTokens: { increment: usageData.total_tokens || 0 },
-          model: usageData.model || 'gpt-3.5-turbo',
+          model,
+          totalTokens: totalTokens + usedTokens,
+          tokenlimit: newLimit,
           updatedAt: new Date(),
         },
       })
     } else {
+      // ✅ 新建记录（初始额度）
+      const remainingLimit = Math.max(defaultLimit - usedTokens, 0)
+
       await db.tokenUseage.create({
         data: {
           userId: user.id,
-          totalTokens: usageData.total_tokens || 0,
-          model: usageData.model || 'gpt-3.5-turbo',
-          tokenlimit: 10000,
+          totalTokens: usedTokens,
+          tokenlimit: remainingLimit,
+          model,
         },
       })
     }
@@ -44,23 +77,50 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ errno: 401, msg: '用户未登录' })
     }
 
-    // 查询当前 token 使用情况
+    // ✅ 查询当前 token 使用情况
     const usageRecord = await db.tokenUseage.findUnique({
       where: { userId: user.id },
     })
 
     let remainingTokens: number
+
     if (!usageRecord) {
-      // 第一次请求，默认额度 10000
-      remainingTokens = 10000
+      // ✅ 第一次使用，创建默认额度记录
+      await db.tokenUseage.create({
+        data: {
+          userId: user.id,
+          totalTokens: 0,
+          tokenlimit: defaultLimit,
+          model: 'gpt-3.5-turbo',
+        },
+      })
+      remainingTokens = defaultLimit
     } else {
-      remainingTokens =
-        (usageRecord.tokenlimit ?? 10000) - (usageRecord.totalTokens ?? 0)
-      if (remainingTokens <= 0) {
-        return NextResponse.json({
-          errno: 403,
-          msg: 'Token 已用完，请充值或等待重置',
+      // ✅ 检查是否需要重置（新月份）
+      const lastUpdated = usageRecord.updatedAt || new Date()
+      const startOfCurrentMonth = startOfMonth(new Date())
+      const startOfLastUpdatedMonth = startOfMonth(lastUpdated)
+
+      if (isBefore(startOfLastUpdatedMonth, startOfCurrentMonth)) {
+        // 🔄 自动重置额度
+        await db.tokenUseage.update({
+          where: { userId: user.id },
+          data: {
+            totalTokens: 0,
+            tokenlimit: defaultLimit,
+            updatedAt: new Date(),
+          },
         })
+        remainingTokens = defaultLimit
+      } else {
+        remainingTokens = usageRecord.tokenlimit ?? defaultLimit
+
+        if (remainingTokens <= 0) {
+          return NextResponse.json({
+            errno: 403,
+            msg: 'Token 已用完，请充值或等待下月自动重置。',
+          })
+        }
       }
     }
 

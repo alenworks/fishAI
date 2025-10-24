@@ -1,10 +1,11 @@
+'use client'
+
 import { EditorContent } from '@tiptap/react'
 import React, { useRef, useState } from 'react'
 import { Sidebar, useSidebar } from '@/components/RightSidebar'
 import { PanelRightClose } from 'lucide-react'
-import { useBlockEditor } from '@/hooks/useBlockEditor'
 import * as Y from 'yjs'
-import { TiptapCollabProvider } from '@hocuspocus/provider'
+import { HocuspocusProvider } from '@hocuspocus/provider' // ✅ 使用你自己的 provider
 import '@/styles/index.css'
 import { ColumnsMenu } from '@/extensions/MultiColumn/menus'
 import {
@@ -16,14 +17,10 @@ import {
 import { TextMenu } from '../menus/TextMenu'
 import { ContentItemMenu } from '../menus/ContentItemMenu'
 import { LinkMenu } from '@/components/menus'
-// import debounce from 'lodash.debounce'
-// import { updateDoc } from '@/app/write/[id]/action'
 import AIIsland from '@/components/AIIsland/ai-island'
-// import emitter from '@/lib/emitter'
-// import { EVENT_KEY_AI_EDIT } from '@/constants'
-// const saveContent = debounce((uid: string, content: string) => {
-//   updateDoc(uid, { content })
-// }, 1000)
+import { useBlockEditor } from '@/hooks/useBlockEditor'
+
+// 表格内容类型
 interface TableContent {
   id: string
 }
@@ -31,42 +28,27 @@ interface TableContent {
 export const BlockEditor = ({
   ydoc,
   provider,
-  content,
-  handleUpdate,
+  hasCollab,
 }: {
   hasCollab: boolean
   ydoc: Y.Doc
-  provider?: TiptapCollabProvider | null | undefined
-  content: string
-  handleUpdate: (content: string) => void
+  provider?: HocuspocusProvider | null
 }) => {
   const [tableContent, setTableContent] = useState<TableContent[]>([])
   const menuContainerRef = useRef(null)
-  // 获取编辑器和用户列表
+
+  // ✅ useBlockEditor 支持协同
   const { editor, users } = useBlockEditor({
     ydoc,
     provider,
+    hasCollab,
     onTableContentUpdate: (items: TableContent[]) => setTableContent(items),
-    handleUpdate,
-    content,
   })
+
   const rightSidebar = useSidebar()
 
-  // 监听 AI island 事件
-  // useEffect(() => {
-  //   function handler(payload: any) {
-  //     if (editor == null) return
-  //     const { content = '', pos = 0 } = payload || {}
-  //     if (!content) return
-
-  //     editor.commands.insertContentAt(pos,content)
-  //   }
-  //   emitter.on(EVENT_KEY_AI_EDIT, handler)
-  //   return () => emitter.off(EVENT_KEY_AI_EDIT, handler) // 及时清除自定义事件
-  // }, [editor])
-
   if (!editor || !users) {
-    return <div>Loading...</div>
+    return <div>Loading collaborative editor...</div>
   }
 
   return (
@@ -89,6 +71,7 @@ export const BlockEditor = ({
         />
       </div>
 
+      {/* 菜单组件 */}
       <ContentItemMenu editor={editor} />
       <LinkMenu editor={editor} appendTo={menuContainerRef} />
       <TextMenu editor={editor} />

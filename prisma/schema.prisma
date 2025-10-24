@@ -91,6 +91,9 @@ model Doc {
   uid       String   @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title     String
   content   String
+  contentBinary Bytes?
+  isDeleted Boolean  @default(false)
+  isStar    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   User      User?    @relation(fields: [userId], references: [id])

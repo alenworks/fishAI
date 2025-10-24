@@ -17,7 +17,6 @@ export async function GET(
   const doc = await db.doc.findUnique({
     where: { id, userId: user.id },
   })
-
   return Response.json(genSuccessData(doc))
 }
 

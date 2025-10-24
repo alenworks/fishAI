@@ -1,6 +1,7 @@
 /**
  * 服务端通用请求封装（Node 端可安全使用）
- * - 用于 Next.js API Route、Server Component、Edge Functions 等
+ * 支持携带 cookie/session
+ * 统一错误返回，不抛异常
  */
 
 import { error as logError, info } from '@/lib/utils/logger'
@@ -11,6 +12,8 @@ type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 interface FetchOptions extends Omit<RequestInit, 'method'> {
   params?: Record<string, string | number | boolean | undefined>
   body?: any
+  /** 可选传入 cookie，用于服务端请求携带 session */
+  cookie?: string
 }
 
 /** 统一响应结构 */
@@ -20,17 +23,11 @@ export interface ApiResponse<T = any> {
   data?: T
 }
 
-/**
- * 🌍 基础 API 地址
- * - 服务端优先使用环境变量中的后端地址
- */
+/** 基础 API 地址 */
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
   ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api`
   : 'http://localhost:3000/api'
 
-/**
- * 泛型工具：根据 path 和 method 返回对应类型（若不存在则 any）
- */
 type MethodResponse<
   P extends string,
   M extends HttpMethod,
@@ -39,16 +36,12 @@ type MethodResponse<
     ? ApiMap[P][M]
     : any
   : any
-
-/**
- * 通用请求函数（支持类型自动推导）
- */
-async function requestServer<P extends string, M extends HttpMethod>(
+export async function requestServer<P extends string, M extends HttpMethod>(
   path: P,
   method: M,
   options: FetchOptions = {}
 ): Promise<ApiResponse<MethodResponse<P, M>>> {
-  const { params, body, headers, ...rest } = options
+  const { params, body, headers, cookie, ...rest } = options
 
   // 拼接查询参数
   const queryString = params
@@ -66,38 +59,54 @@ async function requestServer<P extends string, M extends HttpMethod>(
 
   try {
     info(`[SERVER REQUEST] ${method} ${url}`)
-
+    console.log(cookie, '<<< Cookie sent in server request')
     const res = await fetch(url, {
       method,
       headers: {
         'Content-Type': 'application/json',
         ...(headers || {}),
+        ...(cookie ? { cookie } : {}), // 添加 cookie
       },
       body: method !== 'GET' ? JSON.stringify(body) : undefined,
-      cache: 'no-store', // 🚫 禁止缓存
+      cache: 'no-store',
+      redirect: 'manual', // 不自动跟随重定向
       ...rest,
     })
 
-    if (!res.ok) {
-      const text = await res.text()
-      throw new Error(`HTTP ${res.status}: ${text}`)
+    // 如果返回重定向到登录页，直接返回错误
+    if (res.status >= 300 && res.status < 400) {
+      const location = res.headers.get('location') || '未知地址'
+      logError(`[SERVER REDIRECT] ${method} ${url}`, location)
+      return { errno: -1, msg: `服务端请求被重定向到 ${location}` }
     }
 
-    const data = (await res.json()) as ApiResponse<MethodResponse<P, M>>
+    // 确认返回 JSON
+    const contentType = res.headers.get('content-type') || ''
+    if (!contentType.includes('application/json')) {
+      const text = await res.text()
+      logError(
+        `[SERVER NON-JSON RESPONSE] ${method} ${url}`,
+        `status=${res.status}, body=${text.slice(0, 100)}...`
+      )
+      return { errno: -1, msg: '服务端返回非 JSON 内容' }
+    }
+
+    const data: ApiResponse<MethodResponse<P, M>> = await res.json()
 
     if (data.errno !== 0) {
       logError(`[SERVER BUSINESS ERROR] ${method} ${url}`, data.msg)
-      throw new Error(data.msg || '服务端请求失败')
+      return { errno: data.errno || -1, msg: data.msg || '服务端请求失败' }
     }
 
     return data
   } catch (err: any) {
     logError(`[SERVER FETCH ERROR] ${method} ${url}`, err.message || err)
-    throw err
+    return { errno: -1, msg: err.message || '网络请求失败' }
   }
 }
 
-/** 导出 5 种请求方法（自动推导类型） */
+// ---------------- 5 种请求方法 ----------------
+
 export const getServer = <P extends string>(path: P, options?: FetchOptions) =>
   requestServer(path, 'GET', options)
 
