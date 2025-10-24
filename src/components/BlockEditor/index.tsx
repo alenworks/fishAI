@@ -1,30 +1,37 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Doc as YDoc } from 'yjs'
+import * as Y from 'yjs'
 import { HocuspocusProvider } from '@hocuspocus/provider'
 import { useSearchParams } from 'next/navigation'
 import { BlockEditor } from './BlockEditor'
 import { useCollabStore } from '@/stores/collab-stires'
+
 interface AIEditorProps {
   id: string
   userInfo: {
     name?: string | null
     email?: string | null
-    avator?: string | null
+    avatar?: string | null
   }
 }
 
-export default function AIEditor({ id }: AIEditorProps) {
+export default function AIEditor({ id, userInfo }: AIEditorProps) {
   const searchParams = useSearchParams()
   const [loading, setLoading] = useState(true)
   const { provider, setProvider, setYDoc } = useCollabStore()
   const hasCollab = parseInt(searchParams?.get('noCollab') ?? '0') !== 1
 
-  // 创建 Yjs 文档
-  const ydoc = useMemo(() => new YDoc(), [])
+  // 创建 Yjs 文档，只初始化一次
+  const ydoc = useMemo(() => new Y.Doc(), [])
 
-  // 初始化 HocuspocusProvider
+  // 随机颜色生成函数
+  const randomColor = () => {
+    const colors = ['#FF8A80', '#80D8FF', '#A7FFEB', '#FFD180', '#EA80FC']
+    return colors[Math.floor(Math.random() * colors.length)]
+  }
+
+  // 初始化 Hocuspocus 协同编辑
   useEffect(() => {
     if (!hasCollab || !id) return
 
@@ -37,14 +44,26 @@ export default function AIEditor({ id }: AIEditorProps) {
     setProvider(wsProvider)
     setYDoc(ydoc)
 
+    // 连接状态监听
     wsProvider.on('status', (event: { status: string }) => {
       if (event.status === 'connected') setLoading(false)
     })
 
-    return () => wsProvider.destroy()
-  }, [id, ydoc, hasCollab, setProvider, setYDoc])
+    // ⚡ 设置光标信息
+    if (userInfo) {
+      wsProvider?.awareness?.setLocalStateField('user', {
+        name: userInfo.name || userInfo.email || '匿名用户',
+        color: randomColor(),
+        avatar: userInfo.avatar || null,
+      })
+    }
 
-  // 更丰富的 Loading UI
+    return () => {
+      wsProvider.destroy()
+    }
+  }, [id, ydoc, hasCollab, setProvider, setYDoc, userInfo])
+
+  // Loading 状态骨架 UI
   if (hasCollab && loading) {
     return (
       <div className="flex flex-col h-full w-full p-4 gap-4 animate-pulse">

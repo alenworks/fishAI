@@ -26,6 +26,9 @@ export interface ApiMap {
     GET: Awaited<ReturnType<typeof GET>>['data']
     PATCH: Awaited<ReturnType<typeof PATCH>>['data']
   }
+  '/doc/[id]/share': {
+    POST: Awaited<ReturnType<typeof POST>>['data']
+  }
   '/health': {
     GET: Awaited<ReturnType<typeof GET>>['data']
   }

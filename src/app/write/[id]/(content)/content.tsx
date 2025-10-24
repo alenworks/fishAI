@@ -2,7 +2,6 @@
 
 import { Input } from '@/components/ui/input'
 import TiptapEditor from '@/components/BlockEditor'
-import emitter from '@/lib/emitter'
 import { useDocStore } from '@/stores/doc-stores'
 import { useEffect } from 'react'
 import { useCollabStore } from '@/stores/collab-stires'
@@ -20,14 +19,13 @@ export default function Content(props: {
   }
 }) {
   const { id, initialDoc } = props
-  const { serUserInfo, title, setTitle } = useDocStore()
+  const { setUserInfo, title, setTitle } = useDocStore()
   const { ydoc } = useCollabStore()
   const yTitle = ydoc?.getText('title')
-
   // 初始化用户信息
   useEffect(() => {
-    serUserInfo(initialDoc.userInfo)
-  }, [initialDoc, serUserInfo])
+    setUserInfo(initialDoc.userInfo)
+  }, [initialDoc, setUserInfo])
 
   // 监听 Yjs 标题变化（协同同步）
   useEffect(() => {
@@ -58,9 +56,6 @@ export default function Content(props: {
       yTitle.delete(0, yTitle.length)
       yTitle.insert(0, newTitle)
     }
-
-    const key = `CHANGE_DOC_TITLE_${id}`
-    emitter.emit(key, newTitle)
   }
 
   return (

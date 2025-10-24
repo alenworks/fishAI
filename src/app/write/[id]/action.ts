@@ -17,14 +17,33 @@ export async function getDoc(id: string) {
     })
 
     if (!doc) {
-      throw new Error('Document not found')
+      // ✅ 未找到时返回空结构
+      return {
+        id,
+        title: '',
+        content: '',
+        user: null,
+        createdAt: null,
+        updatedAt: null,
+        isNew: true, // 方便前端识别是空文档
+      }
     }
 
-    // ✅ 将 User 改为小写 user 返回
     const { User, ...rest } = doc
-    return { ...rest, user: User }
+    return { ...rest, user: User, isNew: false }
   } catch (error) {
     console.error('❌ Failed to fetch doc:', error)
-    throw error
+
+    // ✅ 数据库出错时也返回安全的空对象
+    return {
+      id,
+      title: '',
+      content: '',
+      user: null,
+      createdAt: null,
+      updatedAt: null,
+      isNew: true,
+      error: true, // 可选：前端可以据此显示“加载失败，请重试”
+    }
   }
 }

@@ -101,6 +101,9 @@ model Doc {
   parent    Doc?     @relation("ChildrenDocs", fields: [parentId], references: [id])
   parentId  String?
   children  Doc[]    @relation("ChildrenDocs")
+    // 新增分享相关
+  shareToken    String?  @unique
+  isPublic      Boolean  @default(false)
 }
 
 model TokenUseage {

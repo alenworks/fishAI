@@ -10,9 +10,10 @@ import {
   getHierarchicalIndexes,
 } from '@tiptap-pro/extension-table-of-contents'
 import { ExtensionKit } from '@/extensions/extension-kit'
-import { userColors, userNames } from '../lib/constants'
+import { userColors } from '../lib/constants'
 import { randomElement } from '../lib/utils'
 import type { EditorUser } from '../components/BlockEditor/types'
+import { useDocStore } from '@/stores/doc-stores'
 
 declare global {
   interface Window {
@@ -42,6 +43,8 @@ export const useBlockEditor = ({
       ? WebSocketStatus.Connecting
       : WebSocketStatus.Disconnected
   )
+
+  const { userInfo } = useDocStore()
 
   const editor = useEditor(
     {
@@ -83,7 +86,7 @@ export const useBlockEditor = ({
           ? CollaborationCursor.configure({
               provider,
               user: {
-                name: randomElement(userNames),
+                name: userInfo.name || '匿名用户',
                 color: randomElement(userColors),
               },
             })

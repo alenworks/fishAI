@@ -1,5 +1,4 @@
-import { create, getDocList } from './action'
-import CreateSubmitButton from './CreateSubmitButton'
+import { getDocList } from './action'
 import Item from './item'
 export default async function Directory(props: { params: any }) {
   const params = await props.params
@@ -13,9 +12,6 @@ export default async function Directory(props: { params: any }) {
         return <Item key={id} id={id} title={title} paramId={params.id} />
       })}
       {/* <div className="m-2">（会支持层级嵌套）</div> */}
-      <form action={create}>
-        <CreateSubmitButton />
-      </form>
     </div>
   )
 }

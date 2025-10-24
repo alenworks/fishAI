@@ -7,7 +7,7 @@ interface IDocsState {
   title: string
   setTitle: (title: string) => void
   userInfo: UserInfo
-  serUserInfo: (userInfo: UserInfo) => void
+  setUserInfo: (userInfo: UserInfo) => void
 }
 
 export const useDocStore = create<IDocsState>((set) => ({
@@ -16,5 +16,5 @@ export const useDocStore = create<IDocsState>((set) => ({
   userInfo: { id: '', name: '', email: '', avator: '' },
   setTitle: (title) => set({ title }),
   setContent: (content) => set({ content }),
-  serUserInfo: (userInfo: UserInfo) => set({ userInfo }),
+  setUserInfo: (userInfo: UserInfo) => set({ userInfo }),
 }))
