@@ -1,13 +1,12 @@
-// src/app/api/doc/[id]/share/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/db/db'
 import crypto from 'crypto'
 
 export async function POST(
   req: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> } // ✅ 关键修改
 ) {
-  const { id } = context.params
+  const { id } = await context.params // ✅ 注意这里也要 await
 
   const doc = await db.doc.findUnique({ where: { id } })
   if (!doc)
