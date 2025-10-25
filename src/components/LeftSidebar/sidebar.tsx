@@ -11,17 +11,7 @@ import {
   SidebarFooter,
   SidebarGroupAction,
 } from '@/components/ui/sidebar'
-import {
-  Calendar,
-  Home,
-  Inbox,
-  Search,
-  Settings,
-  DollarSign,
-  LogOut,
-  Trash2,
-  PanelLeftDashed,
-} from 'lucide-react'
+import { Home, LogOut, PanelLeftDashed } from 'lucide-react'
 import UserSettingButton from '@/components/user-setting-button'
 import { useState } from 'react'
 export function LeftSidebar(props: {
@@ -31,13 +21,7 @@ export function LeftSidebar(props: {
   const { loginout, user } = props
   const [open, setOpen] = useState<boolean>(false)
   const [ifHover, setIfHover] = useState<boolean>(true)
-  const items = [
-    { title: 'Home', icon: Home },
-    { title: 'Inbox', icon: Inbox },
-    { title: 'Calendar', icon: Calendar },
-    { title: 'Search', icon: Search },
-    { title: 'Settings', icon: Settings },
-  ]
+  const items = [{ title: '主页', icon: Home }]
 
   const handleMouseEnter = () => setOpen(true)
   const handleMouseLeave = () => setOpen(false)
@@ -82,22 +66,22 @@ export function LeftSidebar(props: {
             <SidebarGroup>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  <SidebarMenuItem>
+                  {/* <SidebarMenuItem>
                     <SidebarMenuButton asChild>
                       <a>
                         <Trash2 className="h-4 w-4" />
                         <span>回收站</span>
                       </a>
                     </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
+                  </SidebarMenuItem> */}
+                  {/* <SidebarMenuItem>
                     <SidebarMenuButton asChild>
                       <a>
                         <DollarSign className="h-4 w-4" />
                         <span>升级 VIP</span>
                       </a>
                     </SidebarMenuButton>
-                  </SidebarMenuItem>
+                  </SidebarMenuItem> */}
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
                       <a className="cursor-pointer" onClick={() => loginout()}>

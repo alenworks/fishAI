@@ -30,13 +30,12 @@ export default function AIEditor({ id, userInfo }: AIEditorProps) {
     const colors = ['#FF8A80', '#80D8FF', '#A7FFEB', '#FFD180', '#EA80FC']
     return colors[Math.floor(Math.random() * colors.length)]
   }
-
   // 初始化 Hocuspocus 协同编辑
   useEffect(() => {
     if (!hasCollab || !id) return
 
     const wsProvider = new HocuspocusProvider({
-      url: `${process.env.HOCUSPOCUS_BASE_URL}/collaboration`,
+      url: `${process.env.HOCUSPOCUS_BASE_URL || 'ws://localhost:1234'}/collaboration`,
       name: id,
       document: ydoc,
     })
