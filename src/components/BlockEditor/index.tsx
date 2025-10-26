@@ -6,7 +6,7 @@ import { HocuspocusProvider } from '@hocuspocus/provider'
 import { useSearchParams } from 'next/navigation'
 import { BlockEditor } from './BlockEditor'
 import { useCollabStore } from '@/stores/collab-stires'
-
+import { get } from '@/lib/utils/request'
 interface AIEditorProps {
   id: string
   userInfo: {
@@ -21,7 +21,7 @@ export default function AIEditor({ id, userInfo }: AIEditorProps) {
   const [loading, setLoading] = useState(true)
   const { provider, setProvider, setYDoc } = useCollabStore()
   const hasCollab = parseInt(searchParams?.get('noCollab') ?? '0') !== 1
-
+  const [wsUrl, setWsUrl] = useState<string | null>(null)
   // 创建 Yjs 文档，只初始化一次
   const ydoc = useMemo(() => new Y.Doc(), [])
 
@@ -30,12 +30,30 @@ export default function AIEditor({ id, userInfo }: AIEditorProps) {
     const colors = ['#FF8A80', '#80D8FF', '#A7FFEB', '#FFD180', '#EA80FC']
     return colors[Math.floor(Math.random() * colors.length)]
   }
+
+  const getWsUrl = async () => {
+    try {
+      const res = await get('/config')
+      // Support ApiResponse<T> shape (payload on res.data) or plain object
+      const cfg = res && (res as any).data ? (res as any).data : (res as any)
+      const base = cfg?.hocuspocusBaseUrl
+      if (base) {
+        setWsUrl(base || 'ws://localhost:1234')
+      }
+    } catch (err) {
+      console.error('Failed to fetch config', err)
+    }
+  }
+  // 获取 WS 地址
+  useEffect(() => {
+    getWsUrl()
+  }, [hasCollab])
   // 初始化 Hocuspocus 协同编辑
   useEffect(() => {
-    if (!hasCollab || !id) return
+    if (!hasCollab || !id || !wsUrl) return
 
     const wsProvider = new HocuspocusProvider({
-      url: `${process.env.NEXT_PUBLIC_HOCUSPOCUS_BASE_URL || 'ws://localhost:1234'}/collaboration`,
+      url: `${wsUrl}/collaboration`,
       name: id,
       document: ydoc,
     })
@@ -43,12 +61,10 @@ export default function AIEditor({ id, userInfo }: AIEditorProps) {
     setProvider(wsProvider)
     setYDoc(ydoc)
 
-    // 连接状态监听
     wsProvider.on('status', (event: { status: string }) => {
       if (event.status === 'connected') setLoading(false)
     })
 
-    // ⚡ 设置光标信息
     if (userInfo) {
       wsProvider?.awareness?.setLocalStateField('user', {
         name: userInfo.name || userInfo.email || '匿名用户',
@@ -60,7 +76,7 @@ export default function AIEditor({ id, userInfo }: AIEditorProps) {
     return () => {
       wsProvider.destroy()
     }
-  }, [id, ydoc, hasCollab, setProvider, setYDoc, userInfo])
+  }, [id, ydoc, hasCollab, wsUrl, setProvider, setYDoc, userInfo])
 
   // Loading 状态骨架 UI
   if (hasCollab && loading) {
