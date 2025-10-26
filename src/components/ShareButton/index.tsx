@@ -1,25 +1,25 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { get } from '@/lib/utils/request'
 export function ShareButton({ docId }: { docId: string }) {
   const [link, setLink] = useState('')
 
   async function handleShare() {
     try {
-      const res = await fetch(`/api/doc/${docId}/share`, { method: 'POST' })
-      const data = await res.json()
-      if (data.shareLink) {
+      const res = await get(`/doc/${docId}/share`)
+      if (res.data?.shareLink) {
         // 保存到 state
-        setLink(data.shareLink)
+        setLink(res.data.shareLink)
 
         // 自动复制到剪贴板
-        await navigator.clipboard.writeText(data.shareLink)
+        await navigator.clipboard.writeText(res.data.shareLink)
 
         // 可选：显示提示
         toast.success('分享链接已复制到剪贴板！', { position: 'top-center' })
       }
     } catch (err) {
       console.error('分享失败', err)
-      toast.error('分享失败，请重试')
+      toast.error('分享失败，请重试', { position: 'top-center' })
     }
   }
 

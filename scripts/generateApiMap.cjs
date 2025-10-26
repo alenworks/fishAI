@@ -30,7 +30,7 @@ function getHttpMethods(filePath) {
   const content = fs.readFileSync(filePath, 'utf-8')
   return httpMethods.filter((method) => {
     const regex = new RegExp(
-      `export\\s+async\\s+function\\s+${method}\\s*\\(`,
+      `export\\s+(?:type\\s+)?async\\s+function\\s+${method}\\s*\\(`,
       'i'
     )
     return regex.test(content)
@@ -41,14 +41,7 @@ function getHttpMethods(filePath) {
 function generate() {
   const routeFiles = walkDir(apiDir)
   let content = `/* eslint-disable */\n// ⚙️ 自动生成文件，请勿手动修改\n\n`
-
-  // 声明全局函数，避免 TS 报错
-  content += `// Minimal declarations for ReturnType usage\n`
-  httpMethods.forEach((m) => {
-    content += `declare function ${m}(...args: any[]): Promise<{ data: any }>;\n`
-  })
-
-  content += '\nexport interface ApiMap {\n'
+  content += `export interface ApiMap {\n`
 
   routeFiles.forEach((file) => {
     const relPath = file
@@ -56,15 +49,17 @@ function generate() {
       .replace(/\\/g, '/')
       .replace(/\/route\.ts$/, '')
       .replace(/^\//, '') // 去掉开头斜杠
-
     const pathKey = '/' + relPath
-    const methods = getHttpMethods(file)
 
+    const methods = getHttpMethods(file)
     if (methods.length === 0) return
 
     content += `  '${pathKey}': {\n`
     methods.forEach((method) => {
-      content += `    ${method}: Awaited<ReturnType<typeof ${method}>>['data'];\n`
+      const importPath =
+        './' + path.relative(path.dirname(outputFile), file).replace(/\\/g, '/')
+      // ⚡ 使用 TS Conditional Type 检查类型是否存在，否则 fallback to any
+      content += `    ${method}: Awaited<ReturnType<typeof import('${importPath}')['${method}']>> extends never ? any : Awaited<ReturnType<typeof import('${importPath}')['${method}']>>;\n`
     })
     content += '  };\n'
   })
