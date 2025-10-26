@@ -35,7 +35,7 @@ export default function AIEditor({ id, userInfo }: AIEditorProps) {
     if (!hasCollab || !id) return
 
     const wsProvider = new HocuspocusProvider({
-      url: `${process.env.HOCUSPOCUS_BASE_URL || 'ws://localhost:1234'}/collaboration`,
+      url: `${process.env.NEXT_PUBLIC_HOCUSPOCUS_BASE_URL || 'ws://localhost:1234'}/collaboration`,
       name: id,
       document: ydoc,
     })
