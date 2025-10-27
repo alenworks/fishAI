@@ -13,11 +13,12 @@ export function ShareButton({ docId }: { docId: string }) {
         setLink(res.data.shareLink)
         if (typeof navigator !== 'undefined' && navigator.clipboard) {
           await navigator.clipboard.writeText(res.data.shareLink)
+          toast.success('分享链接已复制到剪贴板！', { position: 'top-center' })
         } else {
           console.warn('Clipboard API 不可用')
+          toast.error('分享失败，请重试', { position: 'top-center' })
         }
         // 自动复制到剪贴板
-        toast.success('分享链接已复制到剪贴板！', { position: 'top-center' })
       }
     } catch (err) {
       console.error('分享失败', err)
