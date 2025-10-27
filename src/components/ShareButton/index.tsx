@@ -7,7 +7,7 @@ export function ShareButton({ docId }: { docId: string }) {
   async function handleShare() {
     try {
       const res = await get(`/doc/${docId}/share`)
-      if (res.data?.shareLink) {
+      if (res.data.shareLink) {
         // 保存到 state
         setLink(res.data.shareLink)
 

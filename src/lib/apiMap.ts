@@ -3,110 +3,32 @@
 
 export interface ApiMap {
   '/ai': {
-    POST: Awaited<
-      ReturnType<(typeof import('./../app/api/ai/route.ts'))['POST']>
-    > extends never
-      ? any
-      : Awaited<ReturnType<(typeof import('./../app/api/ai/route.ts'))['POST']>>
+    POST: any
   }
   '/chat/stream': {
-    POST: Awaited<
-      ReturnType<(typeof import('./../app/api/chat/stream/route.ts'))['POST']>
-    > extends never
-      ? any
-      : Awaited<
-          ReturnType<
-            (typeof import('./../app/api/chat/stream/route.ts'))['POST']
-          >
-        >
+    POST: any
   }
   '/chat/useage': {
-    GET: Awaited<
-      ReturnType<(typeof import('./../app/api/chat/useage/route.ts'))['GET']>
-    > extends never
-      ? any
-      : Awaited<
-          ReturnType<
-            (typeof import('./../app/api/chat/useage/route.ts'))['GET']
-          >
-        >
-    POST: Awaited<
-      ReturnType<(typeof import('./../app/api/chat/useage/route.ts'))['POST']>
-    > extends never
-      ? any
-      : Awaited<
-          ReturnType<
-            (typeof import('./../app/api/chat/useage/route.ts'))['POST']
-          >
-        >
+    GET: any
+    POST: any
   }
   '/config': {
-    GET: Awaited<
-      ReturnType<(typeof import('./../app/api/config/route.ts'))['GET']>
-    > extends never
-      ? any
-      : Awaited<
-          ReturnType<(typeof import('./../app/api/config/route.ts'))['GET']>
-        >
+    GET: import('./../app/api/config/route.ts').ConfigResponse
   }
   '/doc/test-write': {
-    POST: Awaited<
-      ReturnType<
-        (typeof import('./../app/api/doc/test-write/route.ts'))['POST']
-      >
-    > extends never
-      ? any
-      : Awaited<
-          ReturnType<
-            (typeof import('./../app/api/doc/test-write/route.ts'))['POST']
-          >
-        >
+    POST: any
   }
   '/doc/[id]': {
-    GET: Awaited<
-      ReturnType<(typeof import('./../app/api/doc/[id]/route.ts'))['GET']>
-    > extends never
-      ? any
-      : Awaited<
-          ReturnType<(typeof import('./../app/api/doc/[id]/route.ts'))['GET']>
-        >
-    PATCH: Awaited<
-      ReturnType<(typeof import('./../app/api/doc/[id]/route.ts'))['PATCH']>
-    > extends never
-      ? any
-      : Awaited<
-          ReturnType<(typeof import('./../app/api/doc/[id]/route.ts'))['PATCH']>
-        >
+    GET: any
+    PATCH: any
   }
   '/doc/[id]/share': {
-    POST: Awaited<
-      ReturnType<
-        (typeof import('./../app/api/doc/[id]/share/route.ts'))['POST']
-      >
-    > extends never
-      ? any
-      : Awaited<
-          ReturnType<
-            (typeof import('./../app/api/doc/[id]/share/route.ts'))['POST']
-          >
-        >
+    GET: any
   }
   '/health': {
-    GET: Awaited<
-      ReturnType<(typeof import('./../app/api/health/route.ts'))['GET']>
-    > extends never
-      ? any
-      : Awaited<
-          ReturnType<(typeof import('./../app/api/health/route.ts'))['GET']>
-        >
+    GET: any
   }
   '/user': {
-    PATCH: Awaited<
-      ReturnType<(typeof import('./../app/api/user/route.ts'))['PATCH']>
-    > extends never
-      ? any
-      : Awaited<
-          ReturnType<(typeof import('./../app/api/user/route.ts'))['PATCH']>
-        >
+    PATCH: any
   }
 }

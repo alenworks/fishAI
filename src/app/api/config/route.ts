@@ -1,15 +1,18 @@
 import { NextResponse } from 'next/server'
+import { genSuccessData, genErrorData } from '@/app/api/utils/getResData'
 
+export interface ConfigResponse {
+  hocuspocusBaseUrl?: string
+}
 export async function GET() {
   try {
-    return NextResponse.json({
-      status: 'ok',
-      hocuspocusBaseUrl: process.env.NEXT_PUBLIC_HOCUSPOCUS_BASE_URL,
-    })
-  } catch (err: any) {
     return NextResponse.json(
-      { status: 'error', message: err.message },
-      { status: 500 }
+      genSuccessData({
+        hocuspocusBaseUrl:
+          process.env.NEXT_PUBLIC_HOCUSPOCUS_BASE_URL || 'ws://localhost:1234',
+      })
     )
+  } catch (err: any) {
+    return NextResponse.json(genErrorData(err.message))
   }
 }

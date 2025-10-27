@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-/* scripts/generateApiMap.js */
 const fs = require('fs')
 const path = require('path')
 const chokidar = require('chokidar')
@@ -30,11 +29,18 @@ function getHttpMethods(filePath) {
   const content = fs.readFileSync(filePath, 'utf-8')
   return httpMethods.filter((method) => {
     const regex = new RegExp(
-      `export\\s+(?:type\\s+)?async\\s+function\\s+${method}\\s*\\(`,
+      `export\\s+async\\s+function\\s+${method}\\s*\\(`,
       'i'
     )
     return regex.test(content)
   })
+}
+
+// 获取导出的 Response 类型名，如果没有返回 null
+function getExportedResponseType(filePath) {
+  const content = fs.readFileSync(filePath, 'utf-8')
+  const match = content.match(/export\s+(?:type|interface)\s+(\w+Response)\b/)
+  return match ? match[1] : null
 }
 
 // 生成 apiMap.ts
@@ -54,12 +60,17 @@ function generate() {
     const methods = getHttpMethods(file)
     if (methods.length === 0) return
 
+    const importPath =
+      './' + path.relative(path.dirname(outputFile), file).replace(/\\/g, '/')
+
+    const responseType = getExportedResponseType(file)
+    const typeString = responseType
+      ? `import('${importPath}').${responseType}`
+      : 'any' // fallback
+
     content += `  '${pathKey}': {\n`
     methods.forEach((method) => {
-      const importPath =
-        './' + path.relative(path.dirname(outputFile), file).replace(/\\/g, '/')
-      // ⚡ 使用 TS Conditional Type 检查类型是否存在，否则 fallback to any
-      content += `    ${method}: Awaited<ReturnType<typeof import('${importPath}')['${method}']>> extends never ? any : Awaited<ReturnType<typeof import('${importPath}')['${method}']>>;\n`
+      content += `    ${method}: ${typeString};\n`
     })
     content += '  };\n'
   })

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/db/db'
 import crypto from 'crypto'
-
-export async function POST(
+import { genSuccessData } from '@/app/api/utils/getResData'
+export async function GET(
   req: NextRequest,
   context: { params: Promise<{ id: string }> } // ✅ 关键修改
 ) {
@@ -25,5 +25,5 @@ export async function POST(
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
   const shareLink = `${baseUrl}/share/${token}`
 
-  return NextResponse.json({ shareLink })
+  return NextResponse.json(genSuccessData({ shareLink }))
 }

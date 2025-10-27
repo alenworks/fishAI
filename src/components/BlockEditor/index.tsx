@@ -34,11 +34,11 @@ export default function AIEditor({ id, userInfo }: AIEditorProps) {
   const getWsUrl = async () => {
     try {
       const res = await get('/config')
-      // Support ApiResponse<T> shape (payload on res.data) or plain object
-      const cfg = res && (res as any).data ? (res as any).data : (res as any)
-      const base = cfg?.hocuspocusBaseUrl
-      if (base) {
-        setWsUrl(base || 'ws://localhost:1234')
+      if (res?.data) {
+        const base = res.data?.hocuspocusBaseUrl
+        if (base) {
+          setWsUrl(base || 'ws://localhost:1234')
+        }
       }
     } catch (err) {
       console.error('Failed to fetch config', err)
@@ -46,6 +46,7 @@ export default function AIEditor({ id, userInfo }: AIEditorProps) {
   }
   // 获取 WS 地址
   useEffect(() => {
+    if (!hasCollab) return
     getWsUrl()
   }, [hasCollab])
   // 初始化 Hocuspocus 协同编辑
