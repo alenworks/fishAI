@@ -1,3 +1,4 @@
+'use client'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { get } from '@/lib/utils/request'
@@ -10,11 +11,12 @@ export function ShareButton({ docId }: { docId: string }) {
       if (res.data.shareLink) {
         // 保存到 state
         setLink(res.data.shareLink)
-
+        if (typeof navigator !== 'undefined' && navigator.clipboard) {
+          await navigator.clipboard.writeText(res.data.shareLink)
+        } else {
+          console.warn('Clipboard API 不可用')
+        }
         // 自动复制到剪贴板
-        await navigator.clipboard.writeText(res.data.shareLink)
-
-        // 可选：显示提示
         toast.success('分享链接已复制到剪贴板！', { position: 'top-center' })
       }
     } catch (err) {
