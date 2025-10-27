@@ -1,70 +1,61 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Skeleton } from '@/components/ui/skeleton'
 import { Input } from '@/components/ui/input'
 import TiptapEditor from '@/components/BlockEditor'
-import { getDoc, updateContent, updateTitle } from './action'
-import emitter from '@/lib/emitter'
 import { useDocStore } from '@/stores/doc-stores'
-export default function Content(props: { id: string }) {
-  const { id } = props
-  const { setTitle, title } = useDocStore()
-  // loading
-  const [loading, setLoading] = useState(true)
+import { useEffect } from 'react'
+import { useCollabStore } from '@/stores/collab-stires'
 
-  // 找不到文章
-  const [notFound, setNotFound] = useState(false)
-  // 标题
+export default function Content(props: {
+  id: string
+  initialDoc: {
+    initTitle: string
+    userInfo: {
+      id: string
+      name?: string | null
+      email?: string | null
+      avator?: string | null
+    }
+  }
+}) {
+  const { id, initialDoc } = props
+  const { setUserInfo, title, setTitle } = useDocStore()
+  const { ydoc } = useCollabStore()
+  const yTitle = ydoc?.getText('title')
+  // 初始化用户信息
+  useEffect(() => {
+    setUserInfo(initialDoc.userInfo)
+  }, [initialDoc, setUserInfo])
+
+  // 监听 Yjs 标题变化（协同同步）
+  useEffect(() => {
+    if (!yTitle) return
+
+    // 初始化时，若 doc 有内容，用它覆盖 state
+    if (yTitle.toString() && yTitle.toString() !== title) {
+      setTitle(yTitle.toString())
+    }
+
+    // 当协作者修改时触发
+    const observer = () => {
+      setTitle(yTitle.toString())
+    }
+    yTitle.observe(observer)
+
+    return () => {
+      yTitle.unobserve(observer)
+    }
+  }, [yTitle])
+
+  // 本地修改时 -> 更新 Yjs
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const newTitle = e.target.value
     setTitle(newTitle)
-    updateTitle(id, newTitle)
 
-    // 触发事件，以更新左侧列表的文章标题
-    const key = `CHANGE_DOC_TITLE_${id}`
-    emitter.emit(key, newTitle)
-  }
-
-  // 编辑器内容
-  const [editorContent, SetEditorContent] = useState('')
-  function handleUpdate(content: string) {
-    updateContent(id, content)
-  }
-
-  // 获取文章内容
-  useEffect(() => {
-    setLoading(true)
-    getDoc(id).then((data: any) => {
-      // 通过 id 找不到 doc
-      if (data == null) {
-        setNotFound(true)
-        return
-      }
-      setTitle(data.title)
-      SetEditorContent(data.content)
-      setLoading(false)
-    })
-  }, [id])
-
-  if (loading) {
-    return (
-      <div className="flex flex-col space-y-3">
-        <Skeleton className="h-12 w-full" />
-        <div className="space-y-2">
-          <Skeleton className="h-6 w-full" />
-          <Skeleton className="h-6 w-full" />
-        </div>
-      </div>
-    )
-  }
-
-  if (notFound) {
-    return (
-      <div className="p-8 text-center text-muted-foreground">
-        <p>找不到文档...</p>
-      </div>
-    )
+    if (yTitle) {
+      yTitle.delete(0, yTitle.length)
+      yTitle.insert(0, newTitle)
+    }
   }
 
   return (
@@ -76,14 +67,9 @@ export default function Content(props: { id: string }) {
           onChange={handleChange}
           className="border-none text-4xl font-bold focus-visible:ring-transparent md:text-4xl"
         />
-        {/* 可能还会再增加其他功能，例如设置 Icon 、背景等 */}
       </div>
       <div className="flex-1 min-h-0">
-        <TiptapEditor
-          id={id}
-          rawContent={editorContent}
-          handleUpdate={handleUpdate}
-        />
+        <TiptapEditor id={id} userInfo={initialDoc.userInfo} />
       </div>
     </div>
   )

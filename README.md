@@ -11,6 +11,7 @@ git clone 项目。
 ```
 npm install
 npm run db:push
+npx prisma generate
 npm run dev
 ```
 

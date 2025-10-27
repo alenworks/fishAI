@@ -5,6 +5,7 @@ import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css' // KaTeX 样式必须引入！
 import Image from 'next/image'
+import remarkGfm from 'remark-gfm'
 interface MarkdownContentProps {
   data: string
   style?: React.CSSProperties
@@ -20,7 +21,7 @@ const MarkdownContent: React.FC<MarkdownContentProps> = ({ data, style }) => {
   return (
     <div style={{ padding: 12, ...style }}>
       <ReactMarkdown
-        remarkPlugins={[remarkMath]} // ✅ 支持数学公式语法（如 $...$ 或 $$...$$）
+        remarkPlugins={[remarkGfm, remarkMath]} // ✅ 支持数学公式语法（如 $...$ 或 $$...$$）
         rehypePlugins={[rehypeKatex, rehypeSanitize]} // ✅ 渲染 KaTeX + 安全过滤
         components={{
           // ✅ 自定义表格（如果你需要完全控制表格结构）

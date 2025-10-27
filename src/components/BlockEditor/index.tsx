@@ -1,111 +1,95 @@
 'use client'
-import { TiptapCollabProvider } from '@hocuspocus/provider'
-import 'iframe-resizer/js/iframeResizer.contentWindow'
-import { useSearchParams } from 'next/navigation'
+
 import { useEffect, useMemo, useState } from 'react'
-import { Doc as YDoc } from 'yjs'
+import * as Y from 'yjs'
+import { HocuspocusProvider } from '@hocuspocus/provider'
+import { useSearchParams } from 'next/navigation'
 import { BlockEditor } from './BlockEditor'
+import { useCollabStore } from '@/stores/collab-stires'
+import { get } from '@/lib/utils/request'
 interface AIEditorProps {
-  rawContent: string
-  handleUpdate: (content: string) => void
   id: string
+  userInfo: {
+    name?: string | null
+    email?: string | null
+    avatar?: string | null
+  }
 }
-export default function AIEditor(props: AIEditorProps) {
-  const { id, handleUpdate, rawContent } = props
-  // Resolving the `id` value from the Promise
-  const [collabToken, setCollabToken] = useState<string | null>(null)
-  const [aiToken, setAiToken] = useState<string | null>(null)
-  const [provider, setProvider] = useState<TiptapCollabProvider | null>(null)
+
+export default function AIEditor({ id, userInfo }: AIEditorProps) {
   const searchParams = useSearchParams()
+  const [loading, setLoading] = useState(true)
+  const { provider, setProvider, setYDoc } = useCollabStore()
+  const hasCollab = parseInt(searchParams?.get('noCollab') ?? '0') !== 1
+  const [wsUrl, setWsUrl] = useState<string | null>(null)
+  // 创建 Yjs 文档，只初始化一次
+  const ydoc = useMemo(() => new Y.Doc(), [])
 
-  const hasCollab =
-    parseInt(searchParams?.get('noCollab') as string) !== 1 &&
-    collabToken !== null
-
-  // Fetch Collab Token
-  useEffect(() => {
-    const fetchCollabToken = async () => {
-      try {
-        const response = await fetch('/api/collaboration', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-
-        if (!response.ok) {
-          throw new Error('No collaboration token provided.')
-        }
-
-        const data = await response.json()
-        setCollabToken(data.token)
-      } catch (error) {
-        console.error('Error fetching collab token:', error)
-        setCollabToken(null)
-      }
-    }
-
-    fetchCollabToken()
-  }, [])
-
-  // Fetch AI Token
-  useEffect(() => {
-    const fetchAiToken = async () => {
-      try {
-        const response = await fetch('/api/ai', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-
-        if (!response.ok) {
-          throw new Error('No AI token provided.')
-        }
-
-        const data = await response.json()
-        setAiToken(data.token)
-      } catch (error) {
-        console.error('Error fetching AI token:', error)
-        setAiToken(null)
-      }
-    }
-
-    fetchAiToken()
-  }, [])
-
-  const ydoc = useMemo(() => new YDoc(), [])
-
-  // Initialize Tiptap Collab provider only when collabToken is available
-  useEffect(() => {
-    if (hasCollab && collabToken && id) {
-      const tiptapProvider = new TiptapCollabProvider({
-        name: `${process.env.NEXT_PUBLIC_COLLAB_DOC_PREFIX}${id}`,
-        appId: process.env.NEXT_PUBLIC_TIPTAP_COLLAB_APP_ID ?? '',
-        token: collabToken,
-        document: ydoc,
-      })
-      setProvider(tiptapProvider)
-    }
-  }, [collabToken, ydoc, id, hasCollab])
-
-  // Render the BlockEditor only after all necessary data is available
-  if (
-    (hasCollab && !provider) ||
-    aiToken === undefined ||
-    collabToken === undefined ||
-    id === undefined
-  ) {
-    return <div>Loading...</div>
+  // 随机颜色生成函数
+  const randomColor = () => {
+    const colors = ['#FF8A80', '#80D8FF', '#A7FFEB', '#FFD180', '#EA80FC']
+    return colors[Math.floor(Math.random() * colors.length)]
   }
 
-  return (
-    <BlockEditor
-      hasCollab={hasCollab}
-      ydoc={ydoc}
-      provider={provider}
-      handleUpdate={handleUpdate}
-      content={rawContent}
-    />
-  )
+  const getWsUrl = async () => {
+    try {
+      const res = await get('/config')
+      if (res?.data) {
+        const base = res.data?.hocuspocusBaseUrl
+        if (base) {
+          setWsUrl(base || 'ws://localhost:1234')
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch config', err)
+    }
+  }
+  // 获取 WS 地址
+  useEffect(() => {
+    if (!hasCollab) return
+    getWsUrl()
+  }, [hasCollab])
+  // 初始化 Hocuspocus 协同编辑
+  useEffect(() => {
+    if (!hasCollab || !id || !wsUrl) return
+
+    const wsProvider = new HocuspocusProvider({
+      url: `${wsUrl}/collaboration`,
+      name: id,
+      document: ydoc,
+    })
+
+    setProvider(wsProvider)
+    setYDoc(ydoc)
+
+    wsProvider.on('status', (event: { status: string }) => {
+      if (event.status === 'connected') setLoading(false)
+    })
+
+    if (userInfo) {
+      wsProvider?.awareness?.setLocalStateField('user', {
+        name: userInfo.name || userInfo.email || '匿名用户',
+        color: randomColor(),
+        avatar: userInfo.avatar || null,
+      })
+    }
+
+    return () => {
+      wsProvider.destroy()
+    }
+  }, [id, ydoc, hasCollab, wsUrl, setProvider, setYDoc, userInfo])
+
+  // Loading 状态骨架 UI
+  if (hasCollab && loading) {
+    return (
+      <div className="flex flex-col h-full w-full p-4 gap-4 animate-pulse">
+        <div className="h-12 bg-gray-200 rounded-md w-1/2" /> {/* 标题骨架 */}
+        <div className="flex-1 bg-gray-100 rounded-md" /> {/* 编辑区域骨架 */}
+        <div className="h-6 bg-gray-200 rounded-md w-1/4" />{' '}
+        {/* 状态/工具栏骨架 */}
+      </div>
+    )
+  }
+
+  return <BlockEditor hasCollab={hasCollab} ydoc={ydoc} provider={provider} />
 }

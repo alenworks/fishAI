@@ -1,20 +1,19 @@
 import { Logo, ChangeTheme } from '../index'
 import { Button } from '../ui/button'
 import { Forward, Star } from 'lucide-react'
-import Link from 'next/link'
-interface IProps {
-  writeId?: string
-}
-export function WriteNav(props: IProps) {
-  const { writeId } = props
+import { DocUpdateStatus } from '@/components/DocUpdateStatus'
+import { useCollabStore } from '@/stores/collab-stires'
+import { useDocStore } from '@/stores/doc-stores'
+export function WriteNav() {
+  const { provider } = useCollabStore()
+  const { userInfo } = useDocStore()
   return (
     <div className="h-[46px] flex flex-auto text-secondary-foreground my-1 mx-3 bg-ground pb-1 border-b">
       <div className="text-start inline-flex items-center">
         <Logo />
         <div className="pl-4">
           <span className="text-sm leading-8 text-muted-foreground">
-            {/* shadcn-ui 有 breadcrumb 组件，到时看是否用上 */}
-            <Link href="/write/0">文档1</Link> / 文档2 / 文档{writeId}
+            <DocUpdateStatus provider={provider} userInfo={userInfo} />
           </span>
         </div>
       </div>

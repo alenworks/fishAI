@@ -4,7 +4,7 @@ import localFont from 'next/font/local'
 import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 import { handleProcessErrors } from '@/lib/utils/logger'
-
+import { SessionProvider } from 'next-auth/react'
 if (typeof process !== 'undefined' && process.versions?.node) {
   handleProcessErrors() // ✅ 仅在 Node.js 服务端执行一次
 }
@@ -40,7 +40,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <SessionProvider>{children}</SessionProvider>
           <Toaster position="top-right" />
         </ThemeProvider>
       </body>

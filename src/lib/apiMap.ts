@@ -1,38 +1,34 @@
 /* eslint-disable */
 // ⚙️ 自动生成文件，请勿手动修改
 
-// Minimal declarations for ReturnType usage
-declare function GET(...args: any[]): Promise<{ data: any }>
-declare function POST(...args: any[]): Promise<{ data: any }>
-declare function PATCH(...args: any[]): Promise<{ data: any }>
-declare function PUT(...args: any[]): Promise<{ data: any }>
-declare function DELETE(...args: any[]): Promise<{ data: any }>
-
 export interface ApiMap {
   '/ai': {
-    POST: Awaited<ReturnType<typeof POST>>['data']
+    POST: any
   }
   '/chat/stream': {
-    POST: Awaited<ReturnType<typeof POST>>['data']
+    POST: any
   }
   '/chat/useage': {
-    GET: Awaited<ReturnType<typeof GET>>['data']
-    POST: Awaited<ReturnType<typeof POST>>['data']
+    GET: any
+    POST: any
   }
-  '/collaboration': {
-    POST: Awaited<ReturnType<typeof POST>>['data']
+  '/config': {
+    GET: import('./../app/api/config/route.ts').ConfigResponse
   }
   '/doc/test-write': {
-    POST: Awaited<ReturnType<typeof POST>>['data']
+    POST: any
   }
   '/doc/[id]': {
-    GET: Awaited<ReturnType<typeof GET>>['data']
-    PATCH: Awaited<ReturnType<typeof PATCH>>['data']
+    GET: any
+    PATCH: any
+  }
+  '/doc/[id]/share': {
+    GET: any
   }
   '/health': {
-    GET: Awaited<ReturnType<typeof GET>>['data']
+    GET: any
   }
   '/user': {
-    PATCH: Awaited<ReturnType<typeof PATCH>>['data']
+    PATCH: any
   }
 }

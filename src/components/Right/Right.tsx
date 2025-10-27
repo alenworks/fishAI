@@ -7,7 +7,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from '@/components/ui/resizable'
-export function LeftNav({
+export function Right({
   directory,
   content,
 }: {

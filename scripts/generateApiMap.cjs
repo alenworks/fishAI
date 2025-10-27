@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-/* scripts/generateApiMap.js */
 const fs = require('fs')
 const path = require('path')
 const chokidar = require('chokidar')
@@ -37,18 +36,18 @@ function getHttpMethods(filePath) {
   })
 }
 
+// 获取导出的 Response 类型名，如果没有返回 null
+function getExportedResponseType(filePath) {
+  const content = fs.readFileSync(filePath, 'utf-8')
+  const match = content.match(/export\s+(?:type|interface)\s+(\w+Response)\b/)
+  return match ? match[1] : null
+}
+
 // 生成 apiMap.ts
 function generate() {
   const routeFiles = walkDir(apiDir)
   let content = `/* eslint-disable */\n// ⚙️ 自动生成文件，请勿手动修改\n\n`
-
-  // 声明全局函数，避免 TS 报错
-  content += `// Minimal declarations for ReturnType usage\n`
-  httpMethods.forEach((m) => {
-    content += `declare function ${m}(...args: any[]): Promise<{ data: any }>;\n`
-  })
-
-  content += '\nexport interface ApiMap {\n'
+  content += `export interface ApiMap {\n`
 
   routeFiles.forEach((file) => {
     const relPath = file
@@ -56,15 +55,22 @@ function generate() {
       .replace(/\\/g, '/')
       .replace(/\/route\.ts$/, '')
       .replace(/^\//, '') // 去掉开头斜杠
-
     const pathKey = '/' + relPath
-    const methods = getHttpMethods(file)
 
+    const methods = getHttpMethods(file)
     if (methods.length === 0) return
+
+    const importPath =
+      './' + path.relative(path.dirname(outputFile), file).replace(/\\/g, '/')
+
+    const responseType = getExportedResponseType(file)
+    const typeString = responseType
+      ? `import('${importPath}').${responseType}`
+      : 'any' // fallback
 
     content += `  '${pathKey}': {\n`
     methods.forEach((method) => {
-      content += `    ${method}: Awaited<ReturnType<typeof ${method}>>['data'];\n`
+      content += `    ${method}: ${typeString};\n`
     })
     content += '  };\n'
   })

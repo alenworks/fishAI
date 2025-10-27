@@ -3,17 +3,17 @@ import { useEditor, useEditorState } from '@tiptap/react'
 import type { AnyExtension, Editor } from '@tiptap/core'
 import Collaboration from '@tiptap/extension-collaboration'
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor'
-import { TiptapCollabProvider, WebSocketStatus } from '@hocuspocus/provider'
+import { HocuspocusProvider, WebSocketStatus } from '@hocuspocus/provider'
 import type { Doc as YDoc } from 'yjs'
 import {
   TableOfContents,
   getHierarchicalIndexes,
 } from '@tiptap-pro/extension-table-of-contents'
 import { ExtensionKit } from '@/extensions/extension-kit'
-import { userColors, userNames } from '../lib/constants'
+import { userColors } from '../lib/constants'
 import { randomElement } from '../lib/utils'
 import type { EditorUser } from '../components/BlockEditor/types'
-import { initialContent } from '@/lib/data/initialContent'
+import { useDocStore } from '@/stores/doc-stores'
 
 declare global {
   interface Window {
@@ -28,29 +28,23 @@ interface TableContent {
 export const useBlockEditor = ({
   ydoc,
   provider,
+  hasCollab = true, // ✅ 默认开启协同
   onTableContentUpdate,
-  handleUpdate,
-  content,
 }: {
   ydoc: YDoc
-  provider?: TiptapCollabProvider | null | undefined
+  provider?: HocuspocusProvider | null | undefined
+  hasCollab?: boolean
   userId?: string
   userName?: string
   onTableContentUpdate: (item: TableContent[]) => void
-  handleUpdate: (content: string) => void
-  content: string
 }) => {
   const [collabState, setCollabState] = useState<WebSocketStatus>(
-    provider ? WebSocketStatus.Connecting : WebSocketStatus.Disconnected
+    provider && hasCollab
+      ? WebSocketStatus.Connecting
+      : WebSocketStatus.Disconnected
   )
 
-  function gen_content(rawContent: string) {
-    try {
-      return JSON.parse(rawContent)
-    } catch (error: any) {
-      console.error(error)
-    }
-  }
+  const { userInfo } = useDocStore()
 
   const editor = useEditor(
     {
@@ -58,45 +52,41 @@ export const useBlockEditor = ({
       shouldRerenderOnTransaction: false,
       autofocus: true,
       onCreate: (ctx) => {
-        if (provider && !provider.isSynced) {
+        if (provider && hasCollab && !provider.isSynced) {
           provider.on('synced', () => {
             setTimeout(() => {
               if (ctx.editor.isEmpty) {
-                ctx.editor.commands.setContent(initialContent)
+                console.log('editor provider synced...')
               }
             }, 0)
           })
         } else if (ctx.editor.isEmpty) {
-          ctx.editor.commands.setContent(initialContent)
           ctx.editor.commands.focus('start', { scrollIntoView: true })
         }
-      },
-      content: gen_content(content),
-      onUpdate: ({ editor }) => {
-        const data = editor.getJSON()
-        handleUpdate(JSON.stringify(data))
       },
       extensions: [
         TableOfContents.configure({
           getIndex: getHierarchicalIndexes,
           onUpdate(content) {
             onTableContentUpdate(content)
-            // setTableOfContent(content)
           },
         }),
         ...ExtensionKit({
           provider,
         }),
-        provider
+
+        // ✅ 启用协同时才加载以下两个扩展
+        hasCollab && provider
           ? Collaboration.configure({
               document: ydoc,
             })
           : undefined,
-        provider
+
+        hasCollab && provider
           ? CollaborationCursor.configure({
               provider,
               user: {
-                name: randomElement(userNames),
+                name: userInfo.name || '匿名用户',
                 color: randomElement(userColors),
               },
             })
@@ -111,8 +101,9 @@ export const useBlockEditor = ({
         },
       },
     },
-    [ydoc, provider]
+    [ydoc, provider, hasCollab]
   )
+
   const users = useEditorState({
     editor,
     selector: (ctx): (EditorUser & { initials: string })[] => {
@@ -126,7 +117,6 @@ export const useBlockEditor = ({
           const firstName = names?.[0]
           const lastName = names?.[names.length - 1]
           const initials = `${firstName?.[0] || '?'}${lastName?.[0] || '?'}`
-
           return { ...user, initials: initials.length ? initials : '?' }
         }
       )
@@ -134,10 +124,12 @@ export const useBlockEditor = ({
   })
 
   useEffect(() => {
-    provider?.on('status', (event: { status: WebSocketStatus }) => {
-      setCollabState(event.status)
-    })
-  }, [provider])
+    if (provider && hasCollab) {
+      provider.on('status', (event: { status: WebSocketStatus }) => {
+        setCollabState(event.status)
+      })
+    }
+  }, [provider, hasCollab])
 
   // window.editor = editor
 
