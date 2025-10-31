@@ -30,3 +30,12 @@ PS：可参考本地的 `.npmrc` 和 `.env.test` 文件
 - 内测环境 `test-deploy`
 - 预发环境 `preview-test-deploy`
 - 线上环境 `master`
+
+## AI接口服务仓库
+https://github.com/alenworks/koa-ai-server
+## 协同编辑服务仓库
+https://github.com/alenworks/koa-hocuspocus-server
+## 心跳检测服务仓库
+https://github.com/alenworks/monitor-health-server
+
+
