@@ -9,7 +9,7 @@ export function withLogging(handler: (req: Request) => Promise<Response>) {
     try {
       const res = await handler(req)
 
-      // ✅ 确保 handler 返回的是 Response
+      // ✅ 确保 handler 返回 Response
       if (!(res instanceof Response)) {
         throw new Error('Handler did not return a Response object')
       }
@@ -19,19 +19,28 @@ export function withLogging(handler: (req: Request) => Promise<Response>) {
       return res
     } catch (err: any) {
       const duration = Date.now() - start
+
+      // 记录详细错误日志
       error(`[${method}] ${url} - ERROR after ${duration}ms`, {
         message: err?.message,
         stack: err?.stack,
       })
 
-      // ✅ 返回标准化 Response，而不是 undefined
-      return new Response(
-        JSON.stringify({
-          success: false,
-          message: 'Internal Server Error',
-        }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      )
+      // ✅ 判断是否在开发环境
+      const isDev = process.env.NODE_ENV !== 'production'
+
+      const body = {
+        success: false,
+        message: isDev
+          ? err?.message || 'Internal Server Error'
+          : 'Internal Server Error',
+        ...(isDev && err?.stack ? { stack: err.stack } : {}),
+      }
+
+      return new Response(JSON.stringify(body), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      })
     }
   }
 }
