@@ -8,7 +8,7 @@ import {
   PenTool,
 } from 'lucide-react'
 import StartButton from './start-button'
-
+import { Slogan } from '@/components'
 export default function Home() {
   return (
     <div className="min-h-screen bg-background">
@@ -17,7 +17,10 @@ export default function Home() {
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <FileText className="h-6 w-6" />
-            <span className="text-xl font-semibold">双鱼AI</span>
+            <span className="text-xl font-semibold">双鱼</span>
+            <span className="text-xl font-semibold bg-black text-white px-2">
+              AI
+            </span>
           </div>
           <nav className="hidden items-center gap-6 md:flex">
             <a
@@ -49,8 +52,7 @@ export default function Home() {
             <span className="text-muted-foreground">更智能、更高效</span>
           </h1>
           <p className="mb-8 text-pretty text-lg text-muted-foreground md:text-xl">
-            集文档管理、富文本编辑、协作编辑和 AI 写作于一体的现代化工作平台。
-            让团队协作更流畅，让创作更轻松。
+            <Slogan />
           </p>
           <div className="flex flex-col items-center justify-center gap-4">
             <StartButton />

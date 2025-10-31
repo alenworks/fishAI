@@ -9,7 +9,7 @@ export function Slogan() {
   React.useEffect(() => {
     const typed = new Typed(el.current, {
       strings: [
-        '基于 GPT 模型，AI 写作，AI 智能提示，AI 文本处理，多人协同编辑',
+        '集文档管理、富文本编辑、协作编辑和 AI 写作于一体的现代化工作平台。 让团队协作更流畅，让创作更轻松。',
       ],
       startDelay: 300,
       typeSpeed: 100,
