@@ -59,11 +59,21 @@ async function request<M extends HttpMethod, P extends keyof ApiMap | string>(
   const url = `${BASE_URL}${String(path)}${queryString}`
   const loadingId = showLoading ? toast.loading('加载中...') : undefined
 
+  // ✅ 判断是否是 FormData（用于上传文件）
+  const isFormData = body instanceof FormData
+
   try {
     const res = await fetch(url, {
       method,
-      headers: { 'Content-Type': 'application/json', ...(headers || {}) },
-      body: method !== 'GET' ? JSON.stringify(body) : undefined,
+      headers: isFormData
+        ? headers // ✅ 不要手动加 Content-Type
+        : { 'Content-Type': 'application/json', ...(headers || {}) },
+      body:
+        method !== 'GET'
+          ? isFormData
+            ? body // ✅ 直接传 FormData
+            : JSON.stringify(body ?? {})
+          : undefined,
       ...rest,
     })
 
