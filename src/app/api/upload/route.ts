@@ -5,7 +5,7 @@ import {
   genUnAuthData,
   genErrorData,
 } from '../utils/getResData'
-import { ossClient } from '@/lib/oss'
+import { createOssClient } from '@/lib/oss'
 import { withLogging } from '../utils/withLogger'
 
 async function handler(req: Request): Promise<Response> {
@@ -17,14 +17,14 @@ async function handler(req: Request): Promise<Response> {
 
   if (!file)
     return Response.json(genErrorData('No file provided'), { status: 400 })
-  if (
-    process.env.OSS_ACCESS_KEY_ID === undefined ||
-    process.env.OSS_ACCESS_KEY_SECRET === undefined
-  ) {
-    return Response.json(genErrorData('OSS not configured'), { status: 500 })
-  }
+
   const ossFileName = `files/${user.id}/imgs/${uuid()}`
   try {
+    const ossClient = createOssClient()
+    if (!ossClient)
+      return Response.json(genErrorData('OSS client not configured'), {
+        status: 500,
+      })
     const result = await ossClient.put(
       ossFileName,
       Buffer.from(await file.arrayBuffer())
