@@ -17,7 +17,12 @@ async function handler(req: Request): Promise<Response> {
 
   if (!file)
     return Response.json(genErrorData('No file provided'), { status: 400 })
-
+  if (
+    process.env.OSS_ACCESS_KEY_ID === undefined ||
+    process.env.OSS_ACCESS_KEY_SECRET === undefined
+  ) {
+    return Response.json(genErrorData('OSS not configured'), { status: 500 })
+  }
   const ossFileName = `files/${user.id}/imgs/${uuid()}`
   try {
     const result = await ossClient.put(
