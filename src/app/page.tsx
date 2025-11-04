@@ -51,9 +51,9 @@ export default function Home() {
             <br />
             <span className="text-muted-foreground">更智能、更高效</span>
           </h1>
-          <p className="mb-8 text-pretty text-lg text-muted-foreground md:text-xl">
+          <div className="mb-8 text-pretty text-lg text-muted-foreground md:text-xl">
             <Slogan />
-          </p>
+          </div>
           <div className="flex flex-col items-center justify-center gap-4">
             <StartButton />
           </div>
