@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import Link from 'next/link'
 import { auth } from 'auth'
 import { HomeNav } from '@/components/HomeNav'
@@ -17,7 +19,6 @@ export default async function UserTestPage() {
       )
     }
 
-    // ✅ 已登录
     return (
       <Wrapper>
         <div className="flex flex-col items-center">
@@ -29,7 +30,6 @@ export default async function UserTestPage() {
   } catch (err) {
     console.error('❌ 获取 session 失败:', err)
 
-    // ⚠️ Supabase 出错
     return (
       <Wrapper>
         <p className="text-xl">连接认证服务失败，请稍后重试。</p>

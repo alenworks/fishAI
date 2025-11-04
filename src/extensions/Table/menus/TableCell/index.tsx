@@ -18,7 +18,7 @@ import { Surface } from '@/components/ui/Surface'
 const MemoColorPicker = React.memo(ColorPicker)
 const MemoButton = React.memo(Toolbar.Button)
 export const TableCellMenu = React.memo(
-  ({ editor, appendTo }: MenuProps): JSX.Element => {
+  ({ editor, appendTo }: MenuProps): React.JSX.Element => {
     const mergeCells = useCallback(() => {
       editor.commands.mergeCells()
     }, [editor])

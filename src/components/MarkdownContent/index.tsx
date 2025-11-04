@@ -32,16 +32,21 @@ const MarkdownContent: React.FC<MarkdownContentProps> = ({ data, style }) => {
           ),
           // ✅ 自定义图片：设置默认宽高或处理 src
           img: ({ src, alt, width, height, ...props }) => {
-            // 你可以在这里控制默认宽高，或者从 src 解析等
             const defaultWidth = width || 300
             const defaultHeight = height || 200
+            let safeSrc = ''
+
+            if (typeof src === 'string') safeSrc = src
+            else if (src instanceof Blob) safeSrc = URL.createObjectURL(src)
+
             return (
               <Image
-                {...props}
-                src={src || ''}
+                {...(props as any)} // ✅ 绕过 react-markdown 与 next/image 的类型冲突
+                src={safeSrc}
                 width={Number(defaultWidth)}
                 height={Number(defaultHeight)}
                 alt={alt || ''}
+                style={{ maxWidth: '100%', height: 'auto' }}
               />
             )
           },
