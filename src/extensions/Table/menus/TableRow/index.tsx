@@ -23,7 +23,7 @@ import { Surface } from '@/components/ui/Surface'
 const MemoColorPicker = React.memo(ColorPicker)
 const MemoButton = React.memo(Toolbar.Button)
 export const TableRowMenu = React.memo(
-  ({ editor, appendTo }: MenuProps): JSX.Element => {
+  ({ editor, appendTo }: MenuProps): React.JSX.Element => {
     const shouldShow = useCallback(
       ({ view, state, from }: ShouldShowProps) => {
         if (!state || !from) {

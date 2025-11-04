@@ -8,7 +8,7 @@ import { signOut } from 'auth'
 export default async function Layout(props: {
   children: React.ReactNode
   directory: React.ReactNode
-  params: Promise<{ id: string }>
+  params: Promise<{ token: string }>
 }) {
   const user = await getUserInfo()
   const { children, directory } = props

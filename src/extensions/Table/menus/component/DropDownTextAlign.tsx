@@ -14,7 +14,7 @@ import { Icon } from '@/components/ui/Icon'
 type MenuItemWithTitle = {
   key?: string
   title?: string
-  label?: JSX.Element
+  label?: React.JSX.Element
   type?: string
 }
 

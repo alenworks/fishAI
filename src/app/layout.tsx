@@ -30,9 +30,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="h-full font-sans">
+      <head>
+        {/* ✅ 这里放 _document.js 中 <Head> 内的 meta/script/link 标签 */}
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col h-full`}
       >
         <ThemeProvider
           attribute="class"

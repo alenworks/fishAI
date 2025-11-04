@@ -26,7 +26,7 @@ const MemoColorPicker = React.memo(ColorPicker)
 const MemoButton = React.memo(Toolbar.Button)
 
 export const TableMenu = React.memo(
-  ({ editor, appendTo }: MenuProps): JSX.Element => {
+  ({ editor, appendTo }: MenuProps): React.JSX.Element => {
     const onAddColumnBefore = useCallback(() => {
       editor.chain().focus().addColumnBefore().run()
     }, [editor])
