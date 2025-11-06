@@ -61,7 +61,7 @@
 
 DATABASE_URL="postgresql://<DB_USER>:<DB_PASSWORD>@<DB_HOST>:6543/<DB_NAME>?pgbouncer=true"
 
-# <DB_USER>/<DB_PASSWORD>/<DB_HOST>/<DB_NAME> 可在 Supabase 控制台获取
+<DB_USER>/<DB_PASSWORD>/<DB_HOST>/<DB_NAME> 可在 Supabase 控制台获取
 
 # 直接连接数据库（用于迁移）
 
