@@ -179,7 +179,7 @@ http://localhost:3000
    检车是否能连接到supebase，有条件考虑挂代理
 
 2. next.js 报错
-Rm -rf node_modules package-lock.json
+   rm -rf node_modules package-lock.json
    pnpm install
 
 ## 贡献指南
