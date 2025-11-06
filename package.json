@@ -2,6 +2,9 @@
   "name": "fishai-aigc-project",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "concurrently -k --raw -n \"API,DEV\" -c \"blue,green\" \"npm:generate:apiMap:watch\" \"next dev\"",
     "generate:apiMap": "node scripts/generateApiMap.cjs",
