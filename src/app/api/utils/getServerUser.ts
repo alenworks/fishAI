@@ -1,21 +1,30 @@
+// lib/auth.ts
 import { NextRequest } from 'next/server'
-import { db } from '@/db/db'
+import { getToken } from 'next-auth/jwt'
 
 export async function getServerUser(req: NextRequest) {
-  const cookieHeader = req.headers.get('cookie') // 获取 Cookie 字符串
-  if (!cookieHeader) return null
+  try {
+    // 使用 next-auth 提供的 getToken 获取 JWT payload
+    const token = await getToken({
+      req,
+      secret: process.env.AUTH_SECRET, // 你的 NextAuth secret
+    })
 
-  // 找到 authjs.session-token
-  const match = cookieHeader.match(/authjs\.session-token=([^;]+)/)
-  if (!match) return null
+    // token 为 null 表示未登录
+    if (!token) return null
 
-  const sessionToken = match[1]
-
-  const session = await db.session.findUnique({
-    where: { sessionToken },
-    include: { user: true },
-  })
-
-  if (!session?.user) return null
-  return session.user
+    // token 就是 JWT payload，包含你在 jwt() callback 中扩展的字段
+    // 例如: { sub: 'userId', email, name, role, iat, exp }
+    // 你可以根据需要映射成 user 对象
+    return {
+      id: token.sub ?? '',
+      email: token.email,
+      name: token.name,
+      role: token.role,
+      image: token.picture,
+    }
+  } catch (err) {
+    console.error('getServerUser error', err)
+    return null
+  }
 }
