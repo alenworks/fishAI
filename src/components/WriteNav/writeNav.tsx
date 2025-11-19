@@ -20,14 +20,14 @@ export function WriteNav() {
       <div className="flex-1 text-end">
         {/* 后续再拆分组件 */}
         <div className="inline-flex items-center">
-          <Button variant="ghost">
+          {/* <Button variant="ghost">
             <Forward className="h-4 w-4" />
             &nbsp;分享
           </Button>
           <Button variant="ghost">
             <Star className="h-4 w-4" />
             &nbsp;收藏
-          </Button>
+          </Button> */}
           <ChangeTheme />
         </div>
       </div>
